@@ -1,0 +1,133 @@
+.projects-top,
+.projects-middle,
+.projects-bottom {
+	--projects-inline-pad: max(var(--page-pad), calc((100% - 165dvh) / 2));
+	background: var(--white);
+	display: none;
+	width: 100%;
+	align-items: start;
+	gap: clamp(12px, 1.5vw, 24px);
+}
+
+.projects-top > div,
+.projects-middle > div,
+.projects-bottom > div {
+	min-width: 0;
+}
+
+.projects-top {
+	grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+	padding: clamp(44px, 6dvh, 56px) var(--projects-inline-pad) clamp(24px, 4dvh, 48px);
+
+	position: sticky;
+	top: 0;
+}
+
+.projects-middle {
+	position: relative;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 0.78fr);
+	padding: clamp(16px, 3dvh, 32px) var(--projects-inline-pad) clamp(24px, 4dvh, 48px);
+}
+
+.projects-bottom {
+	grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
+	padding: clamp(16px, 3dvh, 32px) var(--projects-inline-pad) clamp(48px, 8dvh, 96px);
+
+	position: sticky;
+	top: 0;
+}
+
+.images {
+	object-fit: cover;
+	object-position: center;
+	cursor: pointer;
+}
+
+.image-animate {
+	opacity: 0;
+}
+
+.image-stack {
+	position: relative;
+	width: 100%;
+	background: var(--grey);
+	overflow: hidden;
+}
+
+.image-stack .images {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+}
+
+.image-stack .images.active {
+	opacity: 1;
+}
+
+.image-stack img {
+	-webkit-user-drag: none;
+	user-select: none;
+	touch-action: manipulation;
+}
+
+.image-stack__tall {
+	aspect-ratio: 3 / 4;
+}
+
+.image-stack__wide {
+	aspect-ratio: 4 / 3;
+}
+
+.tall {
+	aspect-ratio: 3 / 4;
+	width: 100%;
+}
+
+.wide {
+	aspect-ratio: 4 / 3;
+	width: 100%;
+}
+
+.projects-content {
+	display: flex;
+	gap: clamp(16px, 3vw, var(--spacing-lg));
+	margin-top: var(--spacing-xs);
+}
+
+.projects-text {
+	opacity: 0;
+}
+
+.projects-content::selection {
+	background: var(--black);
+	color: var(--white);
+}
+
+@media (width <= 750px) {
+	.projects-top,
+	.projects-middle,
+	.projects-bottom {
+		grid-template-columns: 1fr;
+		gap: var(--spacing-lg);
+		padding-inline: var(--page-pad);
+		position: relative;
+		top: auto;
+	}
+
+	.projects-middle {
+		padding-top: 0;
+		z-index: 2;
+	}
+
+	.projects-bottom {
+		padding-top: 0;
+		padding-bottom: var(--spacing-xl);
+	}
+
+	.projects-content {
+		gap: var(--spacing-regular);
+	}
+}
