@@ -1,11 +1,11 @@
 {
-  "name": "yllis-site",
+  "name": "aditya-gopu",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && rm -rf assets fonts images index.html && cp -R dist/* .",
     "preview": "vite preview"
   },
   "devDependencies": {

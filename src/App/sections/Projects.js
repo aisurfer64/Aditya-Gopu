@@ -54,7 +54,7 @@ export default class Projects extends Section {
 		for (let i = 0; i < project.count; i++) {
 			const img = new Image();
 			img.classList.add(project.type, 'images');
-			img.src = `/images/works/${project.id}/${size}/${i + 1}.avif`;
+			img.src = `images/works/${project.id}/${size}/${i + 1}.avif`;
 			img.alt = project.alt;
 			img.loading = 'lazy';
 

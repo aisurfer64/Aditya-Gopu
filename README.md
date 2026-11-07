@@ -1,16 +1,8 @@
 # Aditya Gopu Portfolio Website
 
-This is the official source code for my portfolio website: [www.ylliramadani.com](https://www.ylliramadani.com).
+Live website: [aisurfer64.github.io/Aditya-Gopu](https://aisurfer64.github.io/Aditya-Gopu/)
 
-**Designed by:** [Rron Berisha](https://www.rronberisha.com)  
-**Developed by:** [Aditya Gopu](https://www.instagram.com/ylli__ramadani/)
-
----
-
-## Awards
-
-- **CSS Design Awards Winner**: [CSS Design Awards](https://www.cssdesignawards.com/sites/ylli-ramadani-portfolio/45293/)
- - **Awwwards Honorable Mention**: [Awwwards](https://www.awwwards.com/sites/ylli-ramadani-portfolio)
+**Developed by:** [Aditya Gopu](https://github.com/aisurfer64)
 
 ---
 

@@ -42,8 +42,9 @@ export default class App {
 	}
 
 	_handleRefresh() {
-		if (window.location.pathname !== '/' || window.location.hash !== '') {
-			window.location.href = '/';
+		if (window.location.hash !== '') {
+			history.replaceState(null, '', window.location.pathname + window.location.search);
+			window.scrollTo(0, 0);
 		}
 	}
 }
