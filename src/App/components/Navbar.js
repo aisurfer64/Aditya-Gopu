@@ -30,6 +30,7 @@ export default class Navbar {
 		this.app = new App();
 		this.about = this.app.about;
 		this.works = this.app.works;
+		this.awards = this.app.awards;
 		this.contact = this.app.contact;
 		this.scroll = this.app.scroll;
 	}
@@ -54,18 +55,22 @@ export default class Navbar {
 	_bindNavLinks() {
 		this.navLinks.forEach(link => {
 			link.addEventListener('click', e => {
-				const id = e.target.getAttribute('href');
+				e.preventDefault();
+				const id = link.getAttribute('href');
 				const target = document.querySelector(id);
 				if (!target) return;
 
-				if (!desktop) {
-					this.navList.classList.remove('active');
-					this._setActiveState(false);
-				}
+				this.navList.classList.remove('active');
+				this._setActiveState(false);
 
-				if (target.classList.contains('about')) this.about.onEnter();
-				if (target.classList.contains('works')) this.works.onEnter();
-				if (target.classList.contains('contact')) this.contact.onEnter();
+				this.scroll.scrollTo(target);
+
+				if (target.classList.contains('about')) this.about?.onEnter?.();
+				if (target.classList.contains('works')) this.works?.onEnter?.();
+				if (target.id === 'awards' || target.classList.contains('s-awards')) {
+					this.awards?.onEnter?.();
+				}
+				if (target.classList.contains('contact')) this.contact?.onEnter?.();
 			});
 		});
 	}

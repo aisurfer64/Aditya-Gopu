@@ -6,6 +6,7 @@ import About from './sections/About';
 import Scattered from './sections/Scattered';
 import Works from './sections/Works';
 import Projects from './sections/Projects';
+import Awards from './sections/Awards';
 import Contact from './sections/Contact';
 import Navbar from './components/Navbar';
 import Loading from './components/Loading';
@@ -28,6 +29,7 @@ export default class App {
 		this.scattered = new Scattered(this.dom.scattered);
 		this.works = new Works(this.dom.works);
 		this.projects = new Projects(this.dom.projectsTop);
+		this.awards = new Awards(this.dom.awards);
 		this.contact = new Contact(this.dom.contact);
 		this.navbar = new Navbar();
 		this.loading = new Loading();

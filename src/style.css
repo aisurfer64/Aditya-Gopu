@@ -1,3 +1,5 @@
+@import './App/css/awards.css';
+
 @font-face {
 	font-family: 'founders-grotesk-x-condensed-bold';
 	src: url('/fonts/founders-grotesk-x-condensed-bold.woff2') format('woff2');
@@ -10,6 +12,46 @@
 	src: url('/fonts/GT-America-Mono-Regular.woff2') format('woff2');
 	font-display: swap;
 	font-weight: normal;
+}
+
+@font-face {
+	font-family: 'Bigger Display';
+	font-style: normal;
+	font-weight: 700;
+	src: url('/fonts/Bigger-Display.woff2') format('woff2');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Editorial New';
+	font-style: normal;
+	font-weight: 200;
+	src: url('/fonts/PPEditorialNew-Ultralight.woff2') format('woff2');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Editorial New';
+	font-style: normal;
+	font-weight: 400;
+	src: url('/fonts/PPEditorialNew-Regular.woff2') format('woff2');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Fraktion Mono';
+	font-style: normal;
+	font-weight: 400;
+	src: url('/fonts/PPFraktionMono-Regular.woff2') format('woff2');
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Fraktion Mono';
+	font-style: normal;
+	font-weight: 700;
+	src: url('/fonts/PPFraktionMono-Bold.woff2') format('woff2');
+	font-display: swap;
 }
 
 *,

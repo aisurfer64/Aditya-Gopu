@@ -1,0 +1,537 @@
+/* ==========================================================================
+   Awards Section Styles — Harmonized with Portfolio Design Tokens
+   ========================================================================== */
+
+.s-awards {
+	--width: 39.25rem;
+	--offset-y: 0px;
+
+	position: relative;
+	z-index: 3;
+	padding: 15rem 0;
+	background: var(--white);
+	color: var(--black);
+	overflow: hidden;
+}
+
+@media (max-width: 1080px) {
+	.s-awards {
+		--width: 32rem;
+	}
+}
+
+@media (max-width: 767px) {
+	.s-awards {
+		--width: 70vw;
+		padding: 7.5rem 0;
+	}
+}
+
+@media (max-width: 576px), (max-width: 767px) and (orientation: landscape) {
+	.s-awards {
+		--width: 80vw;
+	}
+}
+
+/* Centered Inner Container */
+.s-awards .s__inner {
+	position: relative;
+	z-index: 2;
+	margin: 0 auto;
+	width: var(--width);
+	border: 1px solid var(--black);
+	transform: translate3d(0, var(--offset-y), 0);
+	will-change: transform;
+}
+
+/* Header Bar */
+.s-awards .s__title {
+	margin: 0;
+	padding: 0 0 2px;
+	background: var(--black);
+	color: var(--white);
+	font-family: 'Fraktion Mono', var(--family-secondary), monospace;
+	font-size: 12px;
+	line-height: 24px;
+	font-weight: 700;
+	text-align: center;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+}
+
+/* 4x8 Matrix Grid Container with Monochrome Hatched Background */
+.s-awards .s__awards {
+	margin: 0;
+	padding: 0;
+	display: grid;
+	grid-template-columns: repeat(4, calc(var(--width) / 4));
+	grid-template-rows: repeat(8, calc(var(--width) / 4 / 0.751));
+	background: repeating-linear-gradient(
+		-45deg,
+		transparent,
+		transparent 1px,
+		var(--black) 1.5px,
+		var(--black) 2.5px,
+		transparent 3px,
+		var(--white) 11px
+	);
+	list-style: none;
+	overflow: hidden;
+}
+
+@media (max-width: 767px) {
+	.s-awards .s__awards {
+		grid-template-columns: repeat(4, calc(var(--width) / 4));
+		grid-template-rows: repeat(10, calc(var(--width) / 4 / 0.75));
+	}
+}
+
+/* Award Cell Base */
+.s-awards .s__award {
+	position: relative;
+	z-index: 2;
+	margin: 0;
+	padding: 0.75rem;
+	background: var(--white);
+	clip-path: inset(-1px);
+	cursor: default;
+	will-change: transform;
+}
+
+.s-awards .s__award:before {
+	position: absolute;
+	top: -1px;
+	right: 0;
+	bottom: 0;
+	left: -1px;
+	border: 1px solid var(--black);
+	content: '';
+	pointer-events: none;
+}
+
+/* Inner Award Content Wrapper */
+.s-awards .s__award__inner {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 100%;
+	translate: -50% 0;
+	transition:
+		translate 800ms cubic-bezier(0.76, 0.0, 0.24, 1.0),
+		scale 800ms cubic-bezier(0.76, 0.0, 0.24, 1.0);
+	will-change: translate, scale;
+}
+
+/* Sparkle Star Reveal Mask */
+.s-awards .s__award__mask {
+	position: absolute;
+	top: -1px;
+	right: -1px;
+	bottom: -1px;
+	left: -1px;
+	background: var(--black);
+	clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+	transition: clip-path 0.8s cubic-bezier(0.76, 0.0, 0.24, 1.0);
+	will-change: clip-path;
+	pointer-events: none;
+	z-index: 5;
+}
+
+.s-awards .s__award__mask:before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: var(--orange);
+	mask: url('/images/asset-star.svg') center / 1.5rem 1.5rem no-repeat;
+	-webkit-mask: url('/images/asset-star.svg') center / 1.5rem 1.5rem no-repeat;
+	transition: transform 0.8s cubic-bezier(0.76, 0.0, 0.24, 1.0);
+	will-change: transform;
+	content: '';
+}
+
+/* Cell Hover & Revealed States */
+.s-awards .s__award:hover .s__award__inner,
+.s-awards .s__award.is-active .s__award__inner {
+	scale: 0.95;
+	transition: scale 200ms cubic-bezier(0.76, 0.0, 0.24, 1.0);
+}
+
+.s-awards .s__award.is-revealed .s__award__inner {
+	translate: 0 0;
+}
+
+.s-awards .s__award.is-revealed .s__award__mask {
+	clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+}
+
+.s-awards .s__award.is-revealed .s__award__mask:before {
+	transform: translate3d(50%, 0, 0);
+}
+
+/* Typography — Text Cells */
+.s-awards .s__award--text .s__award__inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.s-awards .s__award__text {
+	display: block;
+	margin: 0.25em 0 0;
+	font-family: 'Editorial New', serif;
+	font-weight: 200;
+	font-size: 2.25rem;
+	line-height: 1.13;
+	text-align: center;
+	text-transform: none;
+	text-wrap: balance;
+	color: var(--black);
+}
+
+@media (max-width: 1080px) {
+	.s-awards .s__award__text {
+		font-size: 1.75rem;
+	}
+}
+
+@media (max-width: 767px) {
+	.s-awards .s__award__text {
+		font-size: 1.5rem;
+	}
+}
+
+@media (max-width: 576px) {
+	.s-awards .s__award__text {
+		font-size: 1.25rem;
+	}
+}
+
+@media (max-width: 400px) {
+	.s-awards .s__award__text {
+		font-size: 1.15rem;
+	}
+}
+
+/* Typography — Counter / Wordmark Cells */
+.s-awards .s__award--counter .s__award__inner {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	justify-content: flex-end;
+}
+
+.s-awards .s__award__name {
+	font-family: 'Bigger Display', var(--family-main), sans-serif;
+	font-weight: 700;
+	font-size: 6.5625rem;
+	line-height: 0.82;
+	word-break: break-word;
+	text-transform: uppercase;
+	color: var(--black);
+}
+
+@media (max-width: 1080px) {
+	.s-awards .s__award__name {
+		font-size: 5rem;
+	}
+}
+
+@media (max-width: 576px) {
+	.s-awards .s__award__name {
+		font-size: 4rem;
+	}
+}
+
+@media (max-width: 360px) {
+	.s-awards .s__award__name {
+		font-size: 3.75rem;
+	}
+}
+
+/* Custom wordmark sizing for USAEO (awwwards cell) */
+.s-awards .s__award--awwwards .s__award__name {
+	font-size: 8.625rem;
+}
+
+@media (max-width: 1080px) {
+	.s-awards .s__award--awwwards .s__award__name {
+		font-size: 6.5rem;
+	}
+}
+
+@media (max-width: 767px) {
+	.s-awards .s__award--awwwards .s__award__name {
+		font-size: 5.5rem;
+	}
+}
+
+@media (max-width: 576px) {
+	.s-awards .s__award--awwwards .s__award__name {
+		font-size: 4rem;
+	}
+}
+
+@media (max-width: 400px) {
+	.s-awards .s__award--awwwards .s__award__name {
+		font-size: 3.5rem;
+	}
+}
+
+/* Typography — Captions */
+.s-awards .s__award__counter {
+	font-family: 'Editorial New', serif;
+	font-weight: 200;
+	font-size: 1.25rem;
+	line-height: 1.3;
+	text-transform: none;
+	color: var(--black);
+}
+
+@media (max-width: 1080px) {
+	.s-awards .s__award__counter {
+		font-size: 1.15rem;
+	}
+}
+
+@media (max-width: 576px) {
+	.s-awards .s__award__counter {
+		font-size: 1.1rem;
+	}
+}
+
+/* Cell Grid Coordinates (Desktop Default) */
+.s-awards .s__award--webby2025 {
+	grid-column: 1 / 5;
+	grid-row: 1 / 2;
+}
+
+.s-awards .s__award--awwwards {
+	grid-column: 1 / 3;
+	grid-row: 2 / 4;
+}
+
+.s-awards .s__award--netMag2016 {
+	grid-column: 3 / 5;
+	grid-row: 2 / 3;
+}
+
+.s-awards .s__award--fwa {
+	grid-column: 4 / 5;
+	grid-row: 3 / 4;
+}
+
+.s-awards .s__award--commArt2017 {
+	grid-column: 1 / 5;
+	grid-row: 4 / 5;
+}
+
+.s-awards .s__award--blank {
+	grid-column: 1 / 2;
+	grid-row: 5 / 6;
+}
+
+.s-awards .s__award--cssda {
+	grid-column: 2 / 4;
+	grid-row: 5 / 6;
+}
+
+.s-awards .s__award--gsapOct2024 {
+	grid-column: 1 / 3;
+	grid-row: 6 / 7;
+}
+
+.s-awards .s__award--gsapNov2024 {
+	grid-column: 3 / 5;
+	grid-row: 6 / 7;
+}
+
+.s-awards .s__award--CSSDA2016 {
+	grid-column: 2 / 5;
+	grid-row: 7 / 8;
+}
+
+.s-awards .s__award--CSSDA2015 {
+	grid-column: 1 / 4;
+	grid-row: 8 / 9;
+}
+
+.s-awards .s__award--CSSDA2015:before {
+	bottom: -1px;
+}
+
+/* Cell Grid Coordinates (Tablet-sm <= 767px) */
+@media (max-width: 767px) {
+	.s-awards .s__award--webby2025 {
+		grid-column: 1 / 5;
+		grid-row: 1 / 2;
+	}
+
+	.s-awards .s__award--awwwards {
+		grid-column: 1 / 3;
+		grid-row: 2 / 4;
+	}
+
+	.s-awards .s__award--netMag2016 {
+		grid-column: 3 / 5;
+		grid-row: 2 / 3;
+	}
+
+	.s-awards .s__award--gsapOct2024 {
+		grid-column: 1 / 3;
+		grid-row: 4 / 5;
+	}
+
+	.s-awards .s__award--fwa {
+		grid-column: 3 / 5;
+		grid-row: 4 / 6;
+	}
+
+	.s-awards .s__award--cssda {
+		grid-column: 1 / 3;
+		grid-row: 6 / 8;
+	}
+
+	.s-awards .s__award--gsapNov2024 {
+		grid-column: 3 / 5;
+		grid-row: 6 / 7;
+	}
+
+	.s-awards .s__award--blank {
+		grid-column: 3 / 5;
+		grid-row: 7 / 8;
+	}
+
+	.s-awards .s__award--commArt2017 {
+		grid-column: 1 / 5;
+		grid-row: 8 / 9;
+	}
+
+	.s-awards .s__award--CSSDA2016 {
+		grid-column: 1 / 4;
+		grid-row: 9 / 10;
+	}
+
+	.s-awards .s__award--CSSDA2015 {
+		grid-column: 2 / 5;
+		grid-row: 10 / 11;
+	}
+}
+
+/* Globe Cell (Blank Cell with Wireframe Sphere & 4 Corner Sparkles) */
+.s-awards .s__award--blank {
+	position: relative;
+}
+
+.s-awards .s__award--blank:after {
+	display: none;
+}
+
+.s-awards .s__award--blank svg {
+	position: absolute;
+}
+
+.s-awards .s__award--blank svg:nth-child(1) {
+	top: 50%;
+	left: 50%;
+	width: 62.538%;
+	height: 53.1333%;
+	transform: translate(-50%, -50%);
+}
+
+.s-awards .s__award--blank svg:nth-child(1) path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1px;
+}
+
+.s-awards .s__award--blank svg:nth-child(2),
+.s-awards .s__award--blank svg:nth-child(3),
+.s-awards .s__award--blank svg:nth-child(4),
+.s-awards .s__award--blank svg:nth-child(5) {
+	position: absolute;
+	width: 12.1203%;
+	height: auto;
+}
+
+.s-awards .s__award--blank svg:nth-child(2) path,
+.s-awards .s__award--blank svg:nth-child(3) path,
+.s-awards .s__award--blank svg:nth-child(4) path,
+.s-awards .s__award--blank svg:nth-child(5) path {
+	fill: var(--black);
+	stroke: none;
+}
+
+.s-awards .s__award--blank svg:nth-child(2) {
+	top: 0.5rem;
+	left: 0.5rem;
+}
+
+.s-awards .s__award--blank svg:nth-child(3) {
+	top: 0.5rem;
+	right: 0.5rem;
+}
+
+.s-awards .s__award--blank svg:nth-child(4) {
+	bottom: 0.5rem;
+	left: 0.5rem;
+}
+
+.s-awards .s__award--blank svg:nth-child(5) {
+	bottom: 0.5rem;
+	right: 0.5rem;
+}
+
+.s-awards .s__award--blank path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1px;
+}
+
+/* Perspective Vector SVG Grid */
+.s-awards .s__grid {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+
+.s-awards .s__grid path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1px;
+}
+
+/* Particle Canvas Overlay */
+.s-awards .s__canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+}
+
+/* Selection Highlight */
+.s-awards ::selection {
+	background: var(--black);
+	color: var(--white);
+}
+
+/* Performance Culling State */
+.s-awards.is-out-of-view .s__inner {
+	transform: none;
+	will-change: none;
+}
+
+.s-awards.is-out-of-view .s__grid,
+.s-awards.is-out-of-view .s__canvas {
+	display: none;
+}
