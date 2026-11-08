@@ -16,6 +16,84 @@ export default class About extends Section {
 		this.single = this.element.querySelector('.single');
 		this.aboutMobile = this.element.querySelector('.about-mobile');
 		this.singleHeader = this.element.querySelector('.header-text__single');
+		this.tiltTargets = this.element.querySelectorAll('.interactive-tilt');
+
+		this.tiltOptions = { duration: 300, fill: 'forwards', easing: 'ease-out' };
+		this.resetOptions = { duration: 500, fill: 'forwards', easing: 'ease-out' };
+		this.resetFrames = { transform: 'none' };
+
+		this._bindTiltEvents();
+	}
+
+	_cleanupAnimation(anim, target, clearTransform = false) {
+		if (!anim || !anim.finished || typeof anim.finished.then !== 'function') return;
+		anim.finished
+			.then(() => {
+				if (target && target.isConnected !== false) {
+					if (typeof anim.commitStyles === 'function') {
+						try {
+							anim.commitStyles();
+						} catch {}
+					}
+					if (clearTransform && target.style) {
+						target.style.transform = '';
+					}
+				}
+				if (typeof anim.cancel === 'function') {
+					anim.cancel();
+				}
+			})
+			.catch(() => {});
+	}
+
+	_bindTiltEvents() {
+		this.tiltTargets.forEach(target => {
+			let resetTimeout = null;
+			const handleMove = e => this._handleTilt(e);
+			const handleLeave = () => {
+				target.removeEventListener('mousemove', handleMove);
+				resetTimeout = setTimeout(() => this._handleReset(target), 200);
+			};
+
+			target.addEventListener('mouseenter', () => {
+				if (resetTimeout !== null) {
+					clearTimeout(resetTimeout);
+					resetTimeout = null;
+				}
+				target.addEventListener('mousemove', handleMove);
+			});
+
+			target.addEventListener('mouseleave', handleLeave);
+		});
+	}
+
+	_handleTilt(e) {
+		const target = e.currentTarget;
+		const rect = target.getBoundingClientRect();
+		const halfWidth = rect.width / 2 || 1;
+		const halfHeight = rect.height / 2 || 1;
+		const offsetX = e.clientX - rect.left - rect.width / 2;
+		const offsetY = e.clientY - rect.top - rect.height / 2;
+
+		const normX = Math.max(-1, Math.min(1, offsetX / halfWidth));
+		const normY = Math.max(-1, Math.min(1, offsetY / halfHeight));
+
+		const perspective = 600;
+		const maxTilt = 12;
+		const tiltX = -(normY * maxTilt);
+		const tiltY = normX * maxTilt;
+
+		const keyframes = {
+			transform: `perspective(${perspective}px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1.05)`,
+		};
+
+		const anim = target.animate(keyframes, this.tiltOptions);
+		this._cleanupAnimation(anim, target, false);
+	}
+
+	_handleReset(target) {
+		const anim = target.animate(this.resetFrames, this.resetOptions);
+		this._cleanupAnimation(anim, target, true);
 	}
 
 	_setInitialState() {

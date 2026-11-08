@@ -33,10 +33,23 @@
 	color: var(--white);
 }
 
+.lamp-link {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+
 .lamp {
 	background: var(--grey);
 	aspect-ratio: 3 / 4;
 	overflow: hidden;
+	cursor: pointer;
+}
+
+.interactive-tilt {
+	will-change: transform;
+	transform-style: preserve-3d;
 }
 
 .lamp::selection {
