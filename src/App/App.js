@@ -19,6 +19,11 @@ export default class App {
 		if (instance) return instance;
 		instance = this;
 
+		if ('scrollRestoration' in history) {
+			history.scrollRestoration = 'manual';
+		}
+		this.isReady = false;
+
 		this.scroll = new Lenis();
 		requestAnimationFrame(time => this._handleScroll(time));
 
@@ -36,6 +41,10 @@ export default class App {
 		this.mail = new Mail();
 
 		this._handleRefresh();
+
+		window.addEventListener('pageshow', event => {
+			if (event.persisted) this.resetToTop();
+		});
 	}
 
 	_handleScroll(time) {
@@ -43,10 +52,15 @@ export default class App {
 		requestAnimationFrame(time => this._handleScroll(time));
 	}
 
-	_handleRefresh() {
+	resetToTop() {
 		if (window.location.hash !== '') {
 			history.replaceState(null, '', window.location.pathname + window.location.search);
-			window.scrollTo(0, 0);
 		}
+		window.scrollTo(0, 0);
+		this.scroll.scrollTo(0, { immediate: true, force: true });
+	}
+
+	_handleRefresh() {
+		this.resetToTop();
 	}
 }

@@ -68,6 +68,12 @@ export default class Loading {
 		this._removeLoader();
 		this._displaySections();
 		this._displayNavbar();
+
+		this.app.resetToTop();
+		requestAnimationFrame(() => {
+			this.app.resetToTop();
+			this.app.isReady = true;
+		});
 	}
 
 	// https://easings.net/#easeOutCubic
