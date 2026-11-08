@@ -23,7 +23,7 @@ npm run preview
 
 - **Page assembly:** `src/index.html` is a Handlebars template composed of partials in `src/App/partials/` (`{{> about}}`, `{{> works}}`, …). Section markup lives in the partials, not in index.html.
 - **Entry:** `src/index.js` -> `new App()` (`src/App/App.js`), a singleton that creates the Lenis scroller (driven by its own rAF loop), then instantiates every component and section, passing each the DOM node from `utils/selectors.js` (queried once at import time, so partial IDs/classes must match it).
-- **Sections** (`src/App/sections/*`) extend `components/Section.js`, which wraps an `IntersectionObserver` (threshold 0.3) and calls `onEnter`/exit hooks; each section imports its own CSS from `src/App/css/` and animates with the Web Animations API / `setTimeout` / rAF using shared keyframes in `utils/constants.js`. `src/style.css` `@import`s the per-section CSS.
+- **Sections** (`src/App/sections/*`) extend `components/Section.js`, which wraps an `IntersectionObserver` (threshold 0.3) and calls an overridable `onEnter()` once per section and, on desktop (>=650px), locks Lenis scroll to the section; each section imports its own CSS from `src/App/css/` and animates with the Web Animations API / `setTimeout` / rAF using shared keyframes in `utils/constants.js`. `src/style.css` `@import`s the per-section CSS.
 - **Shared state/data:** `utils/state.js` (small flag object), `utils/data.js` (project list rendered by `Projects`, which fills the `.projects-top/middle/bottom` sections).
 - Animation is hand-rolled (no GSAP in the code), even though GSAP skills are installed (see below).
 
