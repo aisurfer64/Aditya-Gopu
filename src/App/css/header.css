@@ -18,6 +18,33 @@
 	z-index: 99;
 }
 
+/* Backing bar: fades in once the page has scrolled so the nav reads over any section. */
+.nav::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: var(--white);
+	border-bottom: 1px solid var(--black);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 250ms ease-out;
+}
+
+.nav.scrolled::before {
+	opacity: 1;
+}
+
+.nav.active::before {
+	opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.nav::before {
+		transition: none;
+	}
+}
+
 .nav .ul {
 	display: flex;
 	gap: var(--spacing-xs);

@@ -7,14 +7,12 @@ export default class Navbar {
 		this._initElements();
 
 		this._setupApp();
-		this._setupEasings();
-
 		this._hideCloseButton();
 		this._bindEvents();
 		this._bindNavLinks();
 
-		this.lastScrollTop = 0;
 		this.scroll.on('scroll', lenis => this._handleScroll(lenis));
+		this._handleScroll(this.scroll);
 	}
 
 	_initElements() {
@@ -33,12 +31,6 @@ export default class Navbar {
 		this.awards = this.app.awards;
 		this.contact = this.app.contact;
 		this.scroll = this.app.scroll;
-	}
-
-	_setupEasings() {
-		this.scrollUpStyle = { transform: 'translateY(0)', opacity: 1 };
-		this.scrollDownStyle = { transform: 'translateY(-100%)', opacity: 0 };
-		this.animationOptions = { duration: 500, easing: 'ease-in-out', fill: 'forwards' };
 	}
 
 	_hideCloseButton() {
@@ -105,10 +97,10 @@ export default class Navbar {
 		this.closeButton.style.display = isActive ? 'block' : 'none';
 	}
 
+	// The header stays visible on every section. Past the first few pixels it gains a
+	// paper-coloured bar with a 1px hairline (see header.css) so it stays legible over
+	// the white, purple, black and orange sections.
 	_handleScroll(lenis) {
-		const scrollY = lenis.scroll;
-		const animation = scrollY > this.lastScrollTop ? this.scrollDownStyle : this.scrollUpStyle;
-		this.navbar.animate(animation, this.animationOptions);
-		this.lastScrollTop = Math.max(scrollY, 0);
+		this.navbar.classList.toggle('scrolled', lenis.scroll > 8);
 	}
 }
