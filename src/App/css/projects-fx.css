@@ -1,0 +1,1049 @@
+/* ==========================================================================
+   Projects FX: 3D media, hairline placeholder art, ink-wipe reveals, stack depth.
+   Flat and hairline only: no shadows, blur, gradients (the hatch is hard-edged) or opacity tints.
+   ========================================================================== */
+
+.projects-stack {
+	--bz: cubic-bezier(0.76, 0, 0.24, 1); /* the shared in-out used for large reveals */
+}
+
+.projects-seam {
+	text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Armed state: JS adds .is-armed (never under reduced motion); each panel gets
+   .is-in when it is revealed. Without JS or with reduced motion everything is simply shown.
+   ========================================================================== */
+
+.projects-stack.is-armed .project-panel:not(.is-in) .pl-char,
+.projects-stack.is-armed .project-panel:not(.is-in) .project-summary,
+.projects-stack.is-armed .project-panel:not(.is-in) .project-tag,
+.projects-stack.is-armed .project-panel:not(.is-in) .project-meta .hover,
+.projects-stack.is-armed .project-panel:not(.is-in) .pn-cap {
+	opacity: 0;
+}
+
+.projects-stack.is-armed .project-strip::before {
+	scale: 0 1;
+	transition: scale 1400ms var(--bz);
+}
+
+.projects-stack.is-armed .project-panel.is-in .project-strip::before {
+	scale: 1 1;
+}
+
+.projects-stack.is-armed .project-text-bottom::before {
+	scale: 0 1;
+	transition: scale 1400ms var(--bz) 420ms;
+}
+
+.projects-stack.is-armed .project-panel.is-in .project-text-bottom::before {
+	scale: 1 1;
+}
+
+.projects-stack.is-armed .ps-t {
+	transition: translate 900ms var(--ease-wipe) calc(var(--k, 0) * 70ms + 120ms);
+}
+
+.projects-stack.is-armed .project-panel:not(.is-in) .ps-t {
+	translate: 0 110%;
+}
+
+/* per-letter display type */
+.pl-word {
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.pl-char {
+	display: inline-block;
+}
+
+/* ==========================================================================
+   Depth: the inner layer of each panel is driven by ProjectFx (scroll-coupled, lerped).
+   ========================================================================== */
+
+.project-panel.is-near .project-inner {
+	will-change: transform;
+}
+
+/* a panel fully covered by the next one stops animating */
+.project-panel.is-covered .project-inner {
+	will-change: auto;
+}
+
+.project-panel.is-covered .pm-star,
+.project-panel.is-covered .pp-scan,
+.project-panel.is-covered .pc-typed::after {
+	animation-play-state: paused;
+}
+
+/* Cursor dot over a project frame: an ink disc grows out of it with a small label. The dot's own transform
+   belongs to Mouse.js, so the disc is a pseudo-element (Contact.js flips the dot to paper over orange). */
+body > .mouse::before {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 72px;
+	height: 72px;
+	margin: -36px 0 0 -36px;
+	border-radius: 50%;
+	background: var(--black);
+	transform: scale(0);
+	transition: transform 500ms var(--ease-out);
+	pointer-events: none;
+}
+
+body > .mouse.is-view::before {
+	transform: scale(1);
+}
+
+body > .mouse.is-press::before {
+	transform: scale(0.78);
+	transition-duration: 200ms;
+}
+
+body > .mouse.is-view::after {
+	content: 'Open';
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	color: var(--white);
+	font-family: var(--family-secondary);
+	font-size: 11px;
+	line-height: 1;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   Media: a hairline field with a one-point-perspective tunnel (the Awards grid, in miniature),
+   a window floating in front of it, and registration marks floating in front of that.
+   Pointer tilt is applied to .pm-tilt by ProjectMedia (About / Scattered pattern).
+   ========================================================================== */
+
+.project-media {
+	position: relative;
+	display: block;
+	container-type: size;
+	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.pm-tilt {
+	--pm-pad: clamp(22px, 9cqmin, 64px);
+
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	padding: var(--pm-pad);
+
+	border: 1px solid var(--black);
+	background: var(--white);
+	transform-style: preserve-3d;
+	transition: scale 600ms var(--ease-wipe);
+}
+
+.project-media:active .pm-tilt {
+	scale: 0.975;
+	transition-duration: 200ms;
+}
+
+.pm-tilt.is-hover {
+	will-change: transform;
+}
+
+.pm-tunnel {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	pointer-events: none;
+}
+
+.pm-tunnel path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1px;
+}
+
+.pm-window {
+	--ratio: 1.3;
+
+	position: relative;
+	display: grid;
+	grid-template-rows: 24px minmax(0, 1fr);
+	width: min(100cqw - 2 * var(--pm-pad) - 2px, (100cqh - 2 * var(--pm-pad) - 2px) * var(--ratio));
+	aspect-ratio: var(--ratio);
+	border: 1px solid var(--black);
+	background: var(--white);
+	translate: 0 0 36px;
+}
+
+.project-panel[data-kind='image'] .pm-window {
+	--ratio: 1.42;
+}
+
+.project-panel[data-kind='link'] .pm-window {
+	--ratio: 1.38;
+}
+
+/* the Awards title bar: ink, paper mono text */
+.pm-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 0 8px;
+	background: var(--black);
+	color: var(--white);
+	font-family: 'Fraktion Mono', var(--family-secondary), monospace;
+	font-size: 12px;
+	line-height: 24px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.pm-dots {
+	display: flex;
+	gap: 4px;
+	flex: none;
+}
+
+.pm-dots i {
+	display: block;
+	width: 7px;
+	height: 7px;
+	border: 1px solid var(--white);
+}
+
+.pm-addr {
+	flex: 1;
+	min-width: 0;
+	max-width: 22em;
+	margin-inline: auto;
+	height: 16px;
+	padding: 0 8px;
+	border: 1px solid var(--white);
+	line-height: 14px;
+	font-size: 11px;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pm-idx {
+	flex: none;
+	font-size: 11px;
+}
+
+/* registration marks and the one orange star float in front of the window */
+.pm-mark,
+.pm-readout,
+.pm-star {
+	position: absolute;
+	pointer-events: none;
+}
+
+.pm-mark {
+	width: 11px;
+	height: 11px;
+	translate: 0 0 64px;
+}
+
+.pm-mark::before,
+.pm-mark::after {
+	content: '';
+	position: absolute;
+	background: var(--black);
+}
+
+.pm-mark::before {
+	left: 5px;
+	top: 0;
+	width: 1px;
+	height: 11px;
+}
+
+.pm-mark::after {
+	left: 0;
+	top: 5px;
+	width: 11px;
+	height: 1px;
+}
+
+.pm-mark--tl {
+	top: 10px;
+	left: 10px;
+}
+
+.pm-mark--br {
+	right: 10px;
+	bottom: 10px;
+}
+
+.pm-readout {
+	left: calc(var(--pm-pad) * 0.5);
+	bottom: calc(var(--pm-pad) * 0.5 - 7px);
+	padding: 2px 4px;
+	background: var(--white);
+	font-size: 11px;
+	line-height: 1;
+	white-space: nowrap;
+	translate: 0 0 64px;
+}
+
+.pm-readout:empty {
+	display: none;
+}
+
+.pm-star {
+	top: 9px;
+	right: 9px;
+	width: 22px;
+	height: 22px;
+	background: var(--orange);
+	mask: url('/images/asset-star.svg') center / contain no-repeat;
+	-webkit-mask: url('/images/asset-star.svg') center / contain no-repeat;
+	translate: 0 0 72px;
+	animation: pm-spin 22s linear infinite;
+	animation-play-state: paused;
+}
+
+.project-panel.is-near .pm-star {
+	animation-play-state: running;
+}
+
+@keyframes pm-spin {
+	to {
+		rotate: 360deg;
+	}
+}
+
+/* ---------- Ink mask wipe with the orange star riding the edge (Awards pattern) ---------- */
+.pm-wipe {
+	display: none;
+	position: absolute;
+	inset: 0;
+	z-index: 4;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.projects-stack.is-armed .pm-wipe {
+	display: block;
+}
+
+.pm-wipe-ink {
+	position: absolute;
+	inset: -1px;
+	background: var(--black);
+	clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.pm-wipe-rail {
+	position: absolute;
+	inset: 0;
+}
+
+.pm-wipe-star {
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 2rem;
+	height: 2rem;
+	translate: -50% -50%;
+	background: var(--orange);
+	mask: url('/images/asset-star.svg') center / contain no-repeat;
+	-webkit-mask: url('/images/asset-star.svg') center / contain no-repeat;
+}
+
+/* ---------- Live thumbnails: scaled, non-interactive, wiped in once they prove they render ---------- */
+.project-panel .frame {
+	border: 0;
+	background: var(--white);
+}
+
+.project-panel .frame iframe {
+	opacity: 1;
+	pointer-events: none !important;
+	clip-path: inset(0 100% 0 0);
+	transition: clip-path 1100ms var(--bz);
+}
+
+.project-panel .frame.is-live iframe {
+	clip-path: inset(0);
+}
+
+.project-panel .frame .pm-art {
+	transition: visibility 0s linear 1200ms;
+}
+
+/* the orange star rides the swap edge, in step with the iframe's clip wipe */
+.project-panel .frame::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	visibility: hidden;
+	pointer-events: none;
+	background: var(--orange);
+	mask: url('/images/asset-star.svg') -16px 50% / 32px 32px no-repeat;
+	-webkit-mask: url('/images/asset-star.svg') -16px 50% / 32px 32px no-repeat;
+}
+
+.project-panel .frame.is-live::after {
+	animation: pm-edge 1100ms var(--bz) both;
+}
+
+@keyframes pm-edge {
+	from {
+		visibility: visible;
+		transform: translateX(0);
+	}
+	to {
+		visibility: visible;
+		transform: translateX(100%);
+	}
+}
+
+.project-panel .frame.is-live .pm-art {
+	visibility: hidden;
+}
+
+.project-panel .frame img {
+	object-fit: contain;
+}
+
+/* ==========================================================================
+   Placeholder art. Honest stand-ins: hairline ink + one orange accent, no copy that implies facts.
+   They disappear automatically once real media (iframe / image / snippet) arrives.
+   ========================================================================== */
+
+.pm-art {
+	position: absolute;
+	inset: 0;
+	container-type: size;
+	overflow: hidden;
+	background: var(--white);
+	color: var(--black);
+	text-transform: uppercase;
+}
+
+.pm-art i,
+.pm-art b {
+	display: block;
+}
+
+.pm-art i,
+.pm-art h6,
+.pm-art figcaption {
+	clip-path: inset(-2px);
+	transition: clip-path 1000ms var(--bz) calc(var(--k, 0) * 22ms + 650ms);
+}
+
+.projects-stack.is-armed .project-panel:not(.is-in) .pm-art :is(i, h6, figcaption) {
+	clip-path: inset(-2px 100% -2px 0);
+}
+
+.pa-w25 {
+	width: 25%;
+}
+.pa-w40 {
+	width: 40%;
+}
+.pa-w45 {
+	width: 45%;
+}
+.pa-w55 {
+	width: 55%;
+}
+.pa-w60 {
+	width: 60%;
+}
+.pa-w70 {
+	width: 70%;
+}
+.pa-w80 {
+	width: 80%;
+}
+
+/* hit = an ink wash across the target, like a Work-ledger row */
+.pm-art [data-hit]::after,
+.pa-card .pa-img::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: var(--black);
+	clip-path: inset(0 100% 0 0);
+	transition: clip-path 520ms var(--ease-wipe);
+	pointer-events: none;
+}
+
+.pa-card[data-hit]::after {
+	display: none;
+}
+
+.pm-art [data-hit].is-hit::after,
+.pa-card.is-hit .pa-img::after {
+	clip-path: inset(0);
+}
+
+/* ---------- Live site: a browser page that scrolls under a wandering cursor ---------- */
+.pa-page {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 3.4cqw;
+	padding: 3.6cqw 5.4cqw 6cqw 4.2cqw;
+}
+
+.pa-nav {
+	display: flex;
+	align-items: center;
+	gap: 1.8cqw;
+}
+
+.pa-logo {
+	width: 3.4cqw;
+	height: 3.4cqw;
+	border: 1px solid var(--black);
+}
+
+.pa-grow {
+	flex: 1;
+}
+
+.pa-link {
+	position: relative;
+	width: 7cqw;
+	height: 2cqw;
+	border: 1px solid var(--black);
+}
+
+.pa-cta {
+	position: relative;
+	width: 10cqw;
+	height: 3.2cqw;
+	border: 1px solid var(--black);
+}
+
+.pa-hero {
+	display: grid;
+	grid-template-columns: 1.15fr 1fr;
+	gap: 4cqw;
+	align-items: center;
+}
+
+.pa-copy {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5cqw;
+}
+
+.pa-h1 {
+	height: 4.8cqw;
+	border: 1px solid var(--black);
+}
+
+.pa-line {
+	height: 0;
+	border-top: 1px solid var(--black);
+}
+
+.pa-btn {
+	position: relative;
+	width: 15cqw;
+	height: 3.8cqw;
+	margin-top: 1.4cqw;
+	border: 1px solid var(--black);
+}
+
+.pa-btn--sm {
+	width: 11cqw;
+	height: 3cqw;
+	margin: 0;
+}
+
+.pa-img {
+	position: relative;
+	aspect-ratio: 4 / 3;
+	border: 1px solid var(--black);
+}
+
+.pa-cards {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 3cqw;
+}
+
+.pa-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 1.6cqw;
+}
+
+.pa-card .pa-img {
+	aspect-ratio: 5 / 4;
+	margin-bottom: 0.6cqw;
+}
+
+.pa-band {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 3cqw;
+	padding: 3cqw;
+	border: 1px solid var(--black);
+}
+
+.pa-band .pa-line {
+	flex: none;
+}
+
+.pa-foot {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 3cqw;
+}
+
+.pa-foot span {
+	display: flex;
+	flex-direction: column;
+	gap: 1.4cqw;
+}
+
+.pa-rail {
+	position: absolute;
+	top: 3cqw;
+	right: 1.4cqw;
+	bottom: 3cqw;
+	width: 1.1cqw;
+	border: 1px solid var(--black);
+}
+
+.pa-rail b {
+	position: absolute;
+	inset: 0 0 auto;
+	height: 30%;
+	background: var(--black);
+}
+
+.pa-cursor {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 3;
+	width: clamp(12px, 2.8cqw, 20px);
+	height: auto;
+	fill: var(--black);
+	stroke: var(--white);
+	stroke-width: 1.2px;
+	pointer-events: none;
+	transition: scale 200ms var(--ease-out);
+	transform-origin: 8% 6%;
+}
+
+.pa-cursor.is-press {
+	scale: 0.82;
+}
+
+.pa-cursor.is-press path {
+	fill: var(--orange);
+}
+
+/* ---------- Poster: a science-poster board that reads itself ---------- */
+.pp-sheet {
+	position: absolute;
+	inset: 2.6cqw;
+	display: flex;
+	flex-direction: column;
+	gap: 2.4cqw;
+	padding: 2.4cqw;
+	border: 1px solid var(--black);
+	background: var(--white);
+}
+
+.pp-head {
+	position: relative;
+	display: grid;
+	grid-template-columns: 5.4cqw minmax(0, 1fr) 5.4cqw;
+	gap: 2.4cqw;
+	align-items: center;
+	padding-bottom: 2.2cqw;
+	border-bottom: 1px solid var(--black);
+}
+
+.pp-logo {
+	aspect-ratio: 1;
+	border: 1px solid var(--black);
+}
+
+.pp-title {
+	display: flex;
+	flex-direction: column;
+	gap: 1.1cqw;
+}
+
+.pp-h1 {
+	height: 3.6cqw;
+	border: 1px solid var(--black);
+}
+
+.pp-line {
+	height: 0;
+	border-top: 1px solid var(--black);
+}
+
+.pp-foot {
+	display: flex;
+	align-items: center;
+	gap: 1.6cqw;
+	padding-top: 2cqw;
+	border-top: 1px solid var(--black);
+}
+
+.pp-foot .pp-logo {
+	width: 3.6cqw;
+}
+
+.pp-grow {
+	flex: 1;
+}
+
+.pp-cols {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 2.4cqw;
+}
+
+.pp-col {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5cqw;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.pp-label {
+	margin-top: 0.8cqw;
+	font: inherit;
+	font-size: max(8.5px, 1.55cqw);
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.pp-fig {
+	position: relative;
+	flex: none;
+	aspect-ratio: 5 / 3.4;
+	border: 1px solid var(--black);
+}
+
+.pp-fig svg {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+}
+
+.pp-fig figcaption {
+	position: absolute;
+	left: 0.9cqw;
+	bottom: 0.7cqw;
+	z-index: 1;
+	font-size: max(8px, 1.4cqw);
+	line-height: 1;
+	white-space: nowrap;
+}
+
+.pp-fig svg path,
+.pp-fig svg rect {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1px;
+	vector-effect: non-scaling-stroke;
+}
+
+.pp-plot {
+	stroke-dasharray: 1;
+	stroke-dashoffset: 0;
+	transition: stroke-dashoffset 1800ms var(--bz) 1100ms;
+}
+
+.projects-stack.is-armed .project-panel:not(.is-in) .pp-plot {
+	stroke-dashoffset: 1;
+}
+
+.pp-bars rect {
+	transform-box: fill-box;
+	transform-origin: 50% 100%;
+	transition: scale 1100ms var(--bz) calc(900ms + var(--b, 0) * 90ms);
+}
+
+.projects-stack.is-armed .project-panel:not(.is-in) .pp-bars rect {
+	scale: 1 0;
+}
+
+.pp-scan {
+	position: absolute;
+	left: 2.6cqw;
+	right: 2.6cqw;
+	top: 0;
+	height: 1px;
+	background: var(--black);
+	animation: pm-scan 7s linear infinite;
+	animation-play-state: paused;
+	transition: none !important;
+	clip-path: none !important;
+}
+
+.project-panel.is-near .pp-scan {
+	animation-play-state: running;
+}
+
+@keyframes pm-scan {
+	from {
+		translate: 0 2.6cqh;
+	}
+	to {
+		translate: 0 97cqh;
+	}
+}
+
+.pp-focus {
+	position: absolute;
+	z-index: 3;
+	left: 0;
+	top: 0;
+	width: 0;
+	height: 0;
+	border: 1px solid var(--orange);
+	pointer-events: none;
+	transition: none !important;
+	clip-path: none !important;
+}
+
+/* ---------- Code: typing lines + a small network passing a signal through itself ---------- */
+.pm-art--code {
+	display: grid;
+	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+}
+
+.pc-editor {
+	display: flex;
+	gap: 1.8cqw;
+	min-width: 0;
+	min-height: 0;
+	padding: 3cqw 2.4cqw 3cqw 2.8cqw;
+	border-right: 1px solid var(--black);
+	overflow: hidden;
+}
+
+.pc-gutter {
+	display: flex;
+	flex-direction: column;
+	font-size: max(8px, 1.45cqw);
+	text-align: right;
+}
+
+.pc-gutter li {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	height: 3cqw;
+}
+
+.pc-lines {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.pc-typed {
+	position: static;
+	inset: auto;
+	display: block;
+	height: 3cqw;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background: none;
+	font-size: max(9px, 1.75cqw);
+	line-height: 3cqw;
+	white-space: pre;
+	text-transform: none;
+}
+
+.pc-typed::after {
+	content: '';
+	display: inline-block;
+	width: 0.55em;
+	height: 1.05em;
+	margin-left: 1px;
+	background: var(--black);
+	vertical-align: -0.18em;
+	animation: pm-blink 1s steps(1) infinite;
+}
+
+@keyframes pm-blink {
+	50% {
+		background: transparent;
+	}
+}
+
+.pc-l {
+	position: relative;
+	flex: none;
+	width: var(--w, 50%);
+	height: 3cqw;
+	transform-origin: 0 50%;
+}
+
+.pc-l::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 50%;
+	height: 1.1cqw;
+	translate: 0 -50%;
+	border: 1px solid var(--black);
+}
+
+.pc-in1 {
+	margin-left: 3.2cqw;
+}
+
+.pc-in2 {
+	margin-left: 6.4cqw;
+}
+
+.pc-l.is-off {
+	clip-path: inset(-2px 100% -2px 0);
+	transition: none;
+}
+
+.pc-l.is-on {
+	clip-path: inset(-2px);
+	transition: clip-path 520ms var(--ease-out);
+}
+
+.pc-net {
+	position: relative;
+	display: grid;
+	place-items: center;
+	min-width: 0;
+	min-height: 0;
+	padding: 3cqw 1cqw 5.4cqw;
+}
+
+.pc-svg {
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	overflow: visible;
+}
+
+.pc-svg .e {
+	stroke: var(--black);
+	stroke-width: 1px;
+	vector-effect: non-scaling-stroke;
+	transition: stroke 240ms var(--ease-out);
+}
+
+.pc-svg .e.on {
+	stroke: var(--orange);
+}
+
+.pc-svg .n {
+	fill: var(--white);
+	stroke: var(--black);
+	stroke-width: 1px;
+	vector-effect: non-scaling-stroke;
+	transition: fill 240ms var(--ease-out);
+}
+
+.pc-svg .n.on {
+	fill: var(--black);
+}
+
+.pc-svg .pulse {
+	fill: var(--orange);
+}
+
+.pc-cap {
+	position: absolute;
+	left: 2.4cqw;
+	bottom: 2cqw;
+	font-size: max(8.5px, 1.55cqw);
+	line-height: 1;
+	white-space: nowrap;
+}
+
+/* ==========================================================================
+   Mobile + reduced motion: static, flat, no tilt or tunnel motion
+   ========================================================================== */
+
+@media (width <= 750px) {
+	.pm-tilt {
+		--pm-pad: clamp(16px, 7cqmin, 40px);
+	}
+
+	.pm-readout,
+	.pm-mark {
+		display: none;
+	}
+
+	.pm-addr {
+		max-width: none;
+	}
+
+	.pm-idx {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pm-wipe,
+	.pm-readout {
+		display: none !important;
+	}
+
+	.pm-star,
+	.pp-scan,
+	.pc-typed::after,
+	.project-panel .frame.is-live::after {
+		animation: none;
+	}
+
+	.project-panel .frame::after {
+		display: none;
+	}
+
+	body > .mouse::before,
+	.pm-tilt,
+	.pm-art i,
+	.pm-art h6,
+	.pm-art figcaption,
+	.pp-plot,
+	.pp-bars rect,
+	.project-panel .frame iframe,
+	.project-strip::before,
+	.project-text-bottom::before,
+	.ps-t {
+		transition: none !important;
+	}
+}
