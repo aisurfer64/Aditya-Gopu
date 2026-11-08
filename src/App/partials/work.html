@@ -1,0 +1,55 @@
+<div class="work-wrapper">
+	<section id="work" class="work">
+		<div class="work-large">
+			<div class="work-flex">
+				<span class="work-letters">W</span>
+				<span class="work-letters">o</span>
+				<span class="work-letters">r</span>
+				<span class="work-letters">k</span>
+			</div>
+		</div>
+
+		<div class="work-small"><span class="underline">Keep Scrolling</span> <span>+</span></div>
+	</section>
+
+	<section id="work-ledger" class="work-ledger" data-display="block">
+		{{#each work}}
+		<article class="work-row" data-slug="{{slug}}">
+			<h3 class="work-row-title">
+				<button
+					class="work-head"
+					type="button"
+					id="work-head-{{id}}"
+					aria-expanded="false"
+					aria-controls="work-panel-{{id}}"
+				>
+					<span class="work-idx">({{id}})</span>
+					<span class="work-title">{{org}}</span>
+					<span class="work-meta"><span>{{role}}</span><span>{{dates}}</span></span>
+					{{#if image.src}}
+					<span class="work-cell"><img src="{{image.src}}" alt="{{image.alt}}" loading="lazy" /></span>
+					{{else}}
+					<span class="work-cell hatch" aria-hidden="true"></span>
+					{{/if}}
+					<span class="work-toggle" aria-hidden="true">+</span>
+				</button>
+			</h3>
+			<div class="work-panel" id="work-panel-{{id}}" role="region" aria-labelledby="work-head-{{id}}">
+				<div class="work-panel-inner">
+					<div class="work-panel-body">
+						<div class="work-copy">
+							<p class="work-teaser">{{teaser}}</p>
+							{{#each body}}<p class="work-text">{{this}}</p>{{/each}}
+						</div>
+						<dl class="work-facts">
+							{{#each facts}}
+							<div><dt>{{k}}</dt><dd>{{v}}</dd></div>
+							{{/each}}
+						</dl>
+					</div>
+				</div>
+			</div>
+		</article>
+		{{/each}}
+	</section>
+</div>

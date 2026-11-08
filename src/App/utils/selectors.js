@@ -1,10 +1,9 @@
 export const selectors = {
 	about: document.getElementById('about'),
 	scattered: document.querySelector('.scattered'),
-	works: document.getElementById('works'),
-	projectsTop: document.querySelector('.projects-top'),
-	projectsMiddle: document.querySelector('.projects-middle'),
-	projectsBottom: document.querySelector('.projects-bottom'),
+	work: document.getElementById('work'),
+	workLedger: document.getElementById('work-ledger'),
+	projects: document.getElementById('projects'),
 	awards: document.getElementById('awards'),
 	contact: document.getElementById('contact'),
 };

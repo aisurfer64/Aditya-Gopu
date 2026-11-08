@@ -1,0 +1,38 @@
+<section id="projects" class="projects-stack" data-display="block">
+	{{#each projects}}
+	<article
+		class="project-panel project-panel--{{side}}"
+		style="--i: {{@index}}"
+		data-slug="{{slug}}"
+		data-kind="{{media.type}}"
+	>
+		<div class="project-strip"><span>({{id}})</span><span>{{title}}</span><span>{{n}}</span></div>
+		<div class="project-body">
+			<div class="project-text">
+				<div class="project-text-top">
+					{{#if first}}<h2 class="projects-heading">Projects</h2>{{/if}}
+					<h3 class="project-title">{{title}}</h3>
+					<p class="project-summary">{{summary}}</p>
+				</div>
+				<div class="project-text-bottom">
+					<span class="project-tag">{{tag}}</span>
+					<span class="hover"><a class="project-open" href="#projects/{{slug}}">Open project +</a></span>
+				</div>
+			</div>
+			<a class="project-media" href="#projects/{{slug}}" tabindex="-1" aria-hidden="true">
+				<div
+					class="frame hatch"
+					{{#if isEmbed}}data-embed="true" data-url="{{media.url}}" data-handshake="{{media.handshake}}" data-w="{{media.w}}" data-h="{{media.h}}"{{/if}}
+				>
+					{{#if isImage}}{{#if media.src}}<img src="{{media.src}}" alt="{{media.alt}}" loading="lazy" />{{/if}}{{/if}}
+					{{#if isLink}}<pre class="code">{{media.snippet}}</pre>{{/if}}
+				</div>
+				<span class="project-caption">
+					{{#if isEmbed}}{{#if media.url}}Live · {{media.url}}{{else}}Site link pending{{/if}}{{/if}}
+					{{#if isImage}}{{#unless media.src}}Image pending{{/unless}}{{/if}}
+				</span>
+			</a>
+		</div>
+	</article>
+	{{/each}}
+</section>

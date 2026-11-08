@@ -32,18 +32,16 @@ export default class Loading {
 	}
 
 	_initSelectors() {
-		const { about, works, scattered, projectsTop, projectsMiddle, projectsBottom, contact } =
-			this.selectors;
+		const { about, work, workLedger, scattered, projects, contact } = this.selectors;
 
 		this.about = about;
-		this.works = works;
+		this.work = work;
+		this.workLedger = workLedger;
 		this.scattered = scattered;
-		this.projectsTop = projectsTop;
-		this.projectsMiddle = projectsMiddle;
-		this.projectsBottom = projectsBottom;
+		this.projects = projects;
 		this.contact = contact;
 
-		this.visibleElements = [works, scattered, contact, projectsTop, projectsMiddle, projectsBottom];
+		this.visibleElements = [work, workLedger, scattered, contact, projects];
 	}
 
 	_displayBody() {
@@ -55,7 +53,7 @@ export default class Loading {
 	}
 
 	_displaySections() {
-		this.visibleElements.forEach(el => (el.style.display = 'grid'));
+		this.visibleElements.forEach(el => (el.style.display = el.dataset.display || 'grid'));
 	}
 
 	_displayNavbar() {
@@ -73,6 +71,8 @@ export default class Loading {
 		requestAnimationFrame(() => {
 			this.app.resetToTop();
 			this.app.isReady = true;
+			this.app.projects?.mountPending();
+			this.app.overlay?.openFromHash();
 		});
 	}
 

@@ -131,6 +131,10 @@ html.lenis {
 	--spacing-2xl: 120px;
 
 	--page-pad: clamp(14px, 1.8vw, 28px);
+
+	--nav-h: 58px;
+	--ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+	--ease-wipe: cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 body {
@@ -197,8 +201,21 @@ body:hover > .mouse {
 	overflow: hidden;
 }
 
-.works-wrapper {
+.work-wrapper {
 	position: relative;
+}
+
+/* 45deg hatch: the Awards signature, used as the 'nothing here' / poster-pending state */
+.hatch {
+	background: repeating-linear-gradient(
+		-45deg,
+		transparent,
+		transparent 1px,
+		var(--black) 1.5px,
+		var(--black) 2.5px,
+		transparent 3px,
+		var(--white) 11px
+	);
 }
 
 /* Reusable */

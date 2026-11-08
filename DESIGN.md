@@ -148,7 +148,7 @@ A two-tone paper-and-ink palette with a single orange accent. Nothing else carri
 
 ## Layout
 
-A full-bleed, sticky-stacked vertical sequence: loading screen → About → scattered media → Works title → three project rows → Awards → Contact. Sections are mostly `100dvh`, padded by `--page-pad` (`clamp(14px, 1.8vw, 28px)`). Project rows centre in a max width of `165dvh`. The scattered media section runs on a 60-column grid.
+A full-bleed, sticky-stacked vertical sequence: loading screen → About → scattered media → Work title → Work ledger → Projects (four sticky panels, each opening a full-screen detail page) → Awards → Contact. Sections are mostly `100dvh`, padded by `--page-pad` (`clamp(14px, 1.8vw, 28px)`). Project rows centre in a max width of `165dvh`. The scattered media section runs on a 60-column grid.
 
 Spacing is a short ladder: 8 / 16 / 24 / 48 / 80 / 120px. Rhythm comes from whitespace and from the gap between tiers, not from dividers or containers. Breakpoints used: 1250px (nav collapses to flex, cursor hidden, label drops to 14px), 1080px, 767px and 750px (mobile menu), 576px.
 
@@ -224,9 +224,16 @@ Smooth and decelerating. Things arrive fast and settle softly; they never oversh
 
 Documented, not yet changed. These are what a future cleanup would address, pending your decision:
 
-- **Extra colours are in use.** `--yellow #f9cf71` (loading screen background, and the pre-load `body` colour), `--purple #989ec0` (Works section background) and unused `--light-purple`, `--dark-purple`, `--green` are all defined. Under the One Voice Rule these are non-system.
+- **Extra colours are in use.** `--yellow #f9cf71` (loading screen background, and the pre-load `body` colour), `--purple #989ec0` (formerly the Works background; the Work section is now paper and ink, so it is unused) and unused `--light-purple`, `--dark-purple`, `--green` are all defined. Under the One Voice Rule these are non-system.
 - **Easing is symmetric in-out, not out.** The shared `bezier` in `src/App/utils/constants.js` and all Awards transitions use `cubic-bezier(0.76, 0, 0.24, 1)` (easeInOutQuart). Other places use the CSS keywords `ease`, `ease-out` and `ease-in-out`; `Loading.js` uses a hand-written easeOutCubic. None are bouncy, but only the loader count-up matches the power3/4-out target.
 - **Two mono families and four total families in the grid.** GT America Mono is the global label font, while Fraktion Mono is used only for the Awards title bar. Bigger Display is used only for Awards wordmarks. Editorial New Regular (400) is declared but unused, and the Ultralight is used only in Awards.
 - **Serif is confined to Awards.** The serif accent does not appear elsewhere on the page.
 - **Numbered labels are inconsistent:** `00(1)` (scattered), `(001)` (projects), `Issue 01` (about), `60%` (loader).
 - **Font paths:** `style.css` loads fonts from absolute `/fonts/…` URLs, which only resolve because Vite rewrites them at build time; `index.html` at the repo root references `./fonts/`.
+
+
+## Work and Projects
+
+- **Embedded work is a window, not a card.** A live-site preview or poster sits in a flat 1px ink frame with a mono caption underneath; it is the one sanctioned content window. Empty or pending media shows the 45° hatch (`.hatch`), never a placeholder box.
+- **Work** is a hairline ledger (index, display name, mono meta, hatch cell). Rows reveal on scroll and expand as an accordion; hover or open washes the row in ink with an orange index.
+- **Projects** are sticky panels whose index strips accumulate under the nav. A click opens a full-screen paper detail page (text left, media right) with Escape, Close, Prev/Next and back-button support.

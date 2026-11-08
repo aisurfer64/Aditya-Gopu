@@ -1,5 +1,6 @@
 import { resolve } from 'path';
 import handlebars from 'vite-plugin-handlebars';
+import { work, projects } from './src/App/utils/content.js';
 
 export default {
 	root: 'src/',
@@ -16,6 +17,7 @@ export default {
 	plugins: [
 		handlebars({
 			partialDirectory: resolve(__dirname, 'src/App/partials'),
+			context: { work, projects },
 		}),
 	],
 };

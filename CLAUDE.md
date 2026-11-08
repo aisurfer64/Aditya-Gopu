@@ -21,10 +21,11 @@ npm run preview
 
 ## Architecture
 
-- **Page assembly:** `src/index.html` is a Handlebars template composed of partials in `src/App/partials/` (`{{> about}}`, `{{> works}}`, …). Section markup lives in the partials, not in index.html.
+- **Page assembly:** `src/index.html` is a Handlebars template composed of partials in `src/App/partials/` (`{{> about}}`, `{{> work}}`, `{{> projects}}`, …). Section markup lives in the partials, not in index.html.
 - **Entry:** `src/index.js` -> `new App()` (`src/App/App.js`), a singleton that creates the Lenis scroller (driven by its own rAF loop), then instantiates every component and section, passing each the DOM node from `utils/selectors.js` (queried once at import time, so partial IDs/classes must match it).
 - **Sections** (`src/App/sections/*`) extend `components/Section.js`, which wraps an `IntersectionObserver` (threshold 0.3) and calls an overridable `onEnter()` once per section and, on desktop (>=650px), locks Lenis scroll to the section; each section imports its own CSS from `src/App/css/` and animates with the Web Animations API / `setTimeout` / rAF using shared keyframes in `utils/constants.js`. `src/style.css` `@import`s the per-section CSS.
-- **Shared state/data:** `utils/state.js` (small flag object), `utils/data.js` (project list rendered by `Projects`, which fills the `.projects-top/middle/bottom` sections).
+- **Work + Projects:** all copy lives in `utils/content.js` (placeholder text until the user supplies real content). `vite.config.js` passes it to Handlebars as `context`, so `partials/work.html` / `projects.html` render real HTML at build time, and `components/Overlay.js` reads the same module at runtime. `sections/Work.js` is a `Section` (title card letters) plus the hairline ledger accordion. `sections/Projects.js` drives 4 sticky panels (`--i` offsets) and mounts live-site thumbnails via `components/Embed.js`. Clicking a project opens `Overlay.js`, a body-level z-index 500 detail page: it sets `app.isOverlayOpen` (checked in `Section._lockScroll`), calls `scroll.stop()/start()`, makes the page `inert`, and owns history (`#projects/<slug>`, captured as `app.initialHash` before `resetToTop` strips it).
+- **Shared state:** `utils/state.js` (small flag object).
 - Animation is hand-rolled (no GSAP in the code), even though GSAP skills are installed (see below).
 
 ## Claude skills in this repo

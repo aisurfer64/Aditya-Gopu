@@ -1,0 +1,194 @@
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 500;
+
+	display: grid;
+	grid-template-rows: var(--ov-bar) minmax(0, 1fr);
+
+	--ov-bar: 56px;
+
+	background: var(--white);
+	color: var(--black);
+}
+
+.ov-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--spacing-regular);
+
+	padding-inline: var(--page-pad);
+	border-bottom: 1px solid var(--black);
+}
+
+.ov-bar button {
+	font: inherit;
+	color: inherit;
+	text-transform: inherit;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	padding: var(--spacing-xs) 0;
+}
+
+.ov-bar button:focus-visible {
+	outline: 1px solid var(--orange);
+	outline-offset: 2px;
+}
+
+.ov-nav {
+	display: flex;
+	gap: var(--spacing-regular);
+}
+
+.ov-main {
+	display: grid;
+	grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
+	min-height: 0;
+}
+
+.ov-text {
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: var(--spacing-lg) var(--page-pad);
+	border-right: 1px solid var(--black);
+}
+
+.ov-media {
+	display: grid;
+	grid-template-rows: auto minmax(0, 1fr);
+	min-height: 0;
+	overflow: hidden;
+}
+
+.ov-mediabar {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--spacing-sm);
+	padding: var(--spacing-xs) var(--page-pad);
+	border-bottom: 1px solid var(--black);
+}
+
+.ov-stage {
+	position: relative;
+	min-height: 0;
+	overflow: auto;
+	overscroll-behavior: contain;
+}
+
+.ov-stage .frame {
+	height: 100%;
+	border: 0;
+	clip-path: none;
+}
+
+.ov-stage iframe {
+	pointer-events: auto !important; /* beat style.css .lenis-scrolling iframe rule */
+	width: 100%;
+	height: 100%;
+}
+
+.ov-stage .frame img {
+	height: auto;
+	object-fit: contain;
+}
+
+.ov-stage .frame .code {
+	font-size: var(--text-sm);
+}
+
+.ov-fallback {
+	position: absolute;
+	left: var(--page-pad);
+	bottom: var(--page-pad);
+	padding: var(--spacing-xs) var(--spacing-sm);
+	background: var(--white);
+	font-family: 'Editorial New', serif;
+	font-weight: 200;
+	text-transform: none;
+	font-size: 1.25rem;
+}
+
+.ov-title {
+	font-family: var(--family-main);
+	font-size: clamp(56px, 8vw, 140px);
+	line-height: 0.8;
+}
+
+.ov-summary {
+	margin-top: var(--spacing-regular);
+	font-family: 'Editorial New', serif;
+	font-weight: 200;
+	text-transform: none;
+	font-size: 2.25rem;
+	line-height: 1.13;
+	text-wrap: balance;
+}
+
+.ov-body p {
+	margin-top: var(--spacing-sm);
+	max-width: 60ch;
+	font-family: 'Editorial New', serif;
+	font-weight: 200;
+	text-transform: none;
+	font-size: 1.25rem;
+	line-height: 1.3;
+}
+
+.ov-facts {
+	margin-top: var(--spacing-lg);
+	display: flex;
+	flex-direction: column;
+	gap: var(--spacing-xs);
+}
+
+.ov-facts div {
+	display: flex;
+	gap: var(--spacing-sm);
+	padding-bottom: var(--spacing-xs);
+	border-bottom: 1px solid var(--black);
+}
+
+.ov-facts dt {
+	min-width: 6rem;
+}
+
+.ov-links {
+	margin-top: var(--spacing-lg);
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--spacing-sm);
+}
+
+@media (width <= 767px) {
+	.ov-summary {
+		font-size: 1.75rem;
+	}
+}
+
+@media (width <= 750px) {
+	.ov-main {
+		grid-template-columns: 1fr;
+		grid-template-rows: auto;
+		overflow-y: auto;
+		overscroll-behavior: contain;
+	}
+
+	.ov-text {
+		order: 2;
+		overflow: visible;
+		border-right: 0;
+	}
+
+	.ov-media {
+		order: 1;
+		height: 60dvh;
+		border-bottom: 1px solid var(--black);
+	}
+
+	.ov-nav {
+		display: none;
+	}
+}

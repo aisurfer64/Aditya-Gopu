@@ -40,7 +40,7 @@ export default class Section {
 
 	_lockScroll() {
 		if (!desktop) return;
-		if (!this.app.isReady || this.app.isNavigating) return;
+		if (!this.app.isReady || this.app.isNavigating || this.app.isOverlayOpen) return;
 		this.scroll.scrollTo(this.element, { lock: true, force: true });
 	}
 

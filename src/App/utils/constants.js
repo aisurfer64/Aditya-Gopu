@@ -6,3 +6,7 @@ export const pageFrames = [
 ];
 export const pageOptions = { duration: 1500, fill: 'forwards', easing: bezier };
 export const elementOptions = { duration: 800, fill: 'forwards', easing: bezier };
+export const power3out = 'cubic-bezier(0.215, 0.61, 0.355, 1)';
+export const power4out = 'cubic-bezier(0.165, 0.84, 0.44, 1)';
+export const prefersReducedMotion = () =>
+	window.matchMedia('(prefers-reduced-motion: reduce)').matches;

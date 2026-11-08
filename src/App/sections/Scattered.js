@@ -20,7 +20,7 @@ export default class Scattered extends Section {
 		this.videos = Array.from(this.element.querySelectorAll('.scattered-images video'));
 		this.worksWrapper =
 			typeof document !== 'undefined' && typeof document.querySelector === 'function'
-				? document.querySelector('.works-wrapper')
+				? document.querySelector('.work-wrapper')
 				: null;
 	}
 

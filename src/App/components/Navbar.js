@@ -27,7 +27,7 @@ export default class Navbar {
 	_setupApp() {
 		this.app = new App();
 		this.about = this.app.about;
-		this.works = this.app.works;
+		this.work = this.app.work;
 		this.awards = this.app.awards;
 		this.contact = this.app.contact;
 		this.scroll = this.app.scroll;
@@ -48,6 +48,7 @@ export default class Navbar {
 		this.navLinks.forEach(link => {
 			link.addEventListener('click', e => {
 				e.preventDefault();
+				if (this.app.isOverlayOpen) return;
 				const id = link.getAttribute('href');
 				const target = document.querySelector(id);
 				if (!target) return;
@@ -58,7 +59,7 @@ export default class Navbar {
 				this._scrollToSection(target);
 
 				if (target.classList.contains('about')) this.about?.onEnter?.();
-				if (target.classList.contains('works')) this.works?.onEnter?.();
+				if (target.classList.contains('work')) this.work?.onEnter?.();
 				if (target.id === 'awards' || target.classList.contains('s-awards')) {
 					this.awards?.onEnter?.();
 				}

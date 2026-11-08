@@ -4,11 +4,12 @@ import Mouse from './components/Mouse';
 import Dates from './components/Dates';
 import About from './sections/About';
 import Scattered from './sections/Scattered';
-import Works from './sections/Works';
+import Work from './sections/Work';
 import Projects from './sections/Projects';
 import Awards from './sections/Awards';
 import Contact from './sections/Contact';
 import Navbar from './components/Navbar';
+import Overlay from './components/Overlay';
 import Loading from './components/Loading';
 import Mail from './components/Mail';
 
@@ -22,7 +23,9 @@ export default class App {
 		if ('scrollRestoration' in history) {
 			history.scrollRestoration = 'manual';
 		}
+		this.initialHash = window.location.hash;
 		this.isReady = false;
+		this.isOverlayOpen = false;
 
 		this.scroll = new Lenis();
 		requestAnimationFrame(time => this._handleScroll(time));
@@ -32,8 +35,9 @@ export default class App {
 		this.dates = new Dates();
 		this.about = new About(this.dom.about);
 		this.scattered = new Scattered(this.dom.scattered);
-		this.works = new Works(this.dom.works);
-		this.projects = new Projects(this.dom.projectsTop);
+		this.work = new Work(this.dom.work);
+		this.overlay = new Overlay();
+		this.projects = new Projects(this.dom.projects);
 		this.awards = new Awards(this.dom.awards);
 		this.contact = new Contact(this.dom.contact);
 		this.navbar = new Navbar();
