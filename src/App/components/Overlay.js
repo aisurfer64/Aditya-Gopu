@@ -54,6 +54,7 @@ export default class Overlay {
 		this._build();
 		this.savedY = window.scrollY;
 		this.app.isOverlayOpen = true;
+		document.dispatchEvent(new CustomEvent('overlay:open', { detail: { slug } }));
 		this.app.scroll.stop();
 		[...document.body.children].forEach(el => {
 			if (el !== this.root && !el.classList.contains('mouse')) el.inert = true;
@@ -461,6 +462,7 @@ export default class Overlay {
 		}
 
 		this.app.scroll.start();
+		document.dispatchEvent(new CustomEvent('overlay:close'));
 		setTimeout(() => (this.app.isOverlayOpen = false), 200);
 		if (this.trigger && this.trigger.focus) this.trigger.focus({ preventScroll: true });
 		this.closing = false;

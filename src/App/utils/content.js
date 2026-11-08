@@ -90,8 +90,8 @@ const projectList = [
 		summary: TEASER,
 		body: BODY,
 		facts: [{ k: 'Type', v: 'Website' }],
-		media: { type: 'embed', url: null, handshake: false, w: 1440, h: 900 },
-		link: { href: null, label: 'Visit the live site' },
+		media: { type: 'embed', url: 'https://morena-labs.vercel.app/', handshake: false, w: 1440, h: 900 },
+		link: { href: 'https://morena-labs.vercel.app/', label: 'Visit the live site' },
 	},
 	{
 		id: '007',
@@ -102,8 +102,8 @@ const projectList = [
 		summary: TEASER,
 		body: BODY,
 		facts: [{ k: 'Type', v: 'Interactive website' }],
-		media: { type: 'embed', url: null, handshake: false, w: 1440, h: 900 },
-		link: { href: null, label: 'Visit the live site' },
+		media: { type: 'embed', url: 'https://aisurfer64.github.io/3D-Morena-Surgical-Viewer/', handshake: false, w: 1440, h: 900 },
+		link: { href: 'https://aisurfer64.github.io/3D-Morena-Surgical-Viewer/', label: 'Visit the live site' },
 	},
 	{
 		id: '008',
