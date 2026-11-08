@@ -1,6 +1,8 @@
 import '../css/projects.css';
+import '../css/projects-fx.css';
 import App from '../App';
 import Embed from '../components/Embed';
+import ProjectFx from '../components/ProjectFx';
 
 export default class Projects {
 	constructor(element) {
@@ -14,27 +16,16 @@ export default class Projects {
 		this._setNavHeight();
 		window.addEventListener('resize', () => this._setNavHeight());
 
-		this._initReveal();
 		this._initEmbeds();
 		this._bindOpen();
+
+		// reveals, 3D depth between the stacked panels, media tilt and the placeholder art
+		this.fx = new ProjectFx(this);
 	}
 
 	_setNavHeight() {
 		const nav = document.querySelector('.nav');
 		if (nav) document.documentElement.style.setProperty('--nav-h', `${nav.offsetHeight}px`);
-	}
-
-	_initReveal() {
-		this.revealObserver = new IntersectionObserver(
-			entries =>
-				entries.forEach(entry => {
-					if (!entry.isIntersecting) return;
-					entry.target.classList.add('is-revealed');
-					this.revealObserver.unobserve(entry.target);
-				}),
-			{ threshold: 0.25 }
-		);
-		this.panels.forEach(panel => this.revealObserver.observe(panel));
 	}
 
 	// Live thumbnails: desktop, fine pointer, no data-saver only; mounted one at a time near the viewport.

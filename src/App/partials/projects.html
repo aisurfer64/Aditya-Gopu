@@ -1,37 +1,64 @@
 <section id="projects" class="projects-stack" data-display="block">
+	<div class="projects-seam" aria-hidden="true">
+		<span>(Index)</span><span>{{projects.length}} projects</span><span>Scroll +</span>
+	</div>
 	{{#each projects}}
 	<article
-		class="project-panel project-panel--{{side}}"
+		class="project-panel project-panel--{{side}}{{#if first}} is-first{{/if}}"
 		style="--i: {{@index}}"
 		data-slug="{{slug}}"
 		data-kind="{{media.type}}"
 	>
-		<div class="project-strip"><span>({{id}})</span><span>{{title}}</span><span>{{n}}</span></div>
-		<div class="project-body">
-			<div class="project-text">
-				<div class="project-text-top">
-					{{#if first}}<h2 class="projects-heading">Projects</h2>{{/if}}
-					<h3 class="project-title">{{title}}</h3>
-					<p class="project-summary">{{summary}}</p>
+		<div class="project-strip">
+			<span class="ps-cell"><span class="ps-t">({{id}})</span></span>
+			<span class="ps-cell"><span class="ps-t">{{title}}</span></span>
+			<span class="ps-cell"><span class="ps-t project-n">{{n}}</span></span>
+		</div>
+		<div class="project-inner">
+			<div class="project-body">
+				<div class="project-text">
+					<div class="project-text-top">
+						{{#if first}}<h2 class="projects-heading">Projects</h2>{{/if}}
+						<h3 class="project-title">{{title}}</h3>
+						<p class="project-summary">{{summary}}</p>
+					</div>
+					<div class="project-text-bottom">
+						<div class="project-num" aria-hidden="true"></div>
+						<div class="project-meta">
+							<span class="project-tag">{{tag}}</span>
+							<span class="hover"><a class="project-open" href="#projects/{{slug}}">Open project +</a></span>
+						</div>
+					</div>
 				</div>
-				<div class="project-text-bottom">
-					<span class="project-tag">{{tag}}</span>
-					<span class="hover"><a class="project-open" href="#projects/{{slug}}">Open project +</a></span>
-				</div>
+				<a class="project-media" href="#projects/{{slug}}" tabindex="-1" aria-hidden="true">
+					<div class="pm-tilt">
+						<svg class="pm-tunnel" aria-hidden="true"><path class="pm-tunnel-path" d="" /></svg>
+						<div class="pm-window">
+							<div class="pm-bar">
+								<span class="pm-dots"><i></i><i></i><i></i></span>
+								<span class="pm-addr"><span class="project-caption">{{#if isEmbed}}{{#if media.url}}Live · {{media.url}}{{else}}Site link pending{{/if}}{{/if}}{{#if isImage}}{{#if media.src}}Poster{{else}}Image pending{{/if}}{{/if}}{{#if isLink}}Code{{/if}}</span></span>
+								<span class="pm-idx">{{n}}</span>
+							</div>
+							<div
+								class="frame"
+								{{#if isEmbed}}data-embed="true" data-url="{{media.url}}" data-handshake="{{media.handshake}}" data-w="{{media.w}}" data-h="{{media.h}}"{{/if}}
+							>
+								{{#if isEmbed}}{{> project-art-site}}{{/if}}
+								{{#if isImage}}{{#if media.src}}<img src="{{media.src}}" alt="{{media.alt}}" loading="lazy" />{{else}}{{> project-art-poster}}{{/if}}{{/if}}
+								{{#if isLink}}{{> project-art-code}}{{/if}}
+							</div>
+						</div>
+						<span class="pm-mark pm-mark--tl"></span>
+						<span class="pm-mark pm-mark--br"></span>
+						<span class="pm-readout"></span>
+						<span class="pm-star"></span>
+					</div>
+					<span class="pm-wipe" aria-hidden="true">
+						<span class="pm-wipe-ink"></span>
+						<span class="pm-wipe-rail"><span class="pm-wipe-star"></span></span>
+					</span>
+				</a>
 			</div>
-			<a class="project-media" href="#projects/{{slug}}" tabindex="-1" aria-hidden="true">
-				<div
-					class="frame hatch"
-					{{#if isEmbed}}data-embed="true" data-url="{{media.url}}" data-handshake="{{media.handshake}}" data-w="{{media.w}}" data-h="{{media.h}}"{{/if}}
-				>
-					{{#if isImage}}{{#if media.src}}<img src="{{media.src}}" alt="{{media.alt}}" loading="lazy" />{{/if}}{{/if}}
-					{{#if isLink}}<pre class="code">{{media.snippet}}</pre>{{/if}}
-				</div>
-				<span class="project-caption">
-					{{#if isEmbed}}{{#if media.url}}Live · {{media.url}}{{else}}Site link pending{{/if}}{{/if}}
-					{{#if isImage}}{{#unless media.src}}Image pending{{/unless}}{{/if}}
-				</span>
-			</a>
 		</div>
 	</article>
 	{{/each}}

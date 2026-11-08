@@ -1,9 +1,12 @@
 import App from '../App';
 
 /**
- * A live-site preview inside a `.frame` element. The frame keeps its hatch/poster underneath;
- * the iframe fades in only once it has proven it can render (postMessage handshake, or `load`
+ * A live-site preview inside a `.frame` element. The frame keeps its placeholder art underneath;
+ * the iframe is revealed (a clip wipe in the Projects panels, a fade in the detail overlay, both driven by
+ * the `.is-live` class) only once it has proven it can render (postMessage handshake, or `load`
  * when the embedded site can't send one) and is removed if it never does.
+ * Non-interactive thumbnails are a scaled, pointer-transparent window: the cursor dot stays visible and a
+ * click falls through to the panel. Interactive embeds (the overlay) take over the pointer, so the dot hides.
  */
 export default class Embed {
 	constructor(frame, { url, handshake = false, w = 1440, h = 900, interactive = false, timeout = 4000 }) {
@@ -47,8 +50,10 @@ export default class Embed {
 		window.addEventListener('message', this._onMessage);
 		if (!this.handshake) iframe.addEventListener('load', () => setTimeout(() => this._live(), 1200));
 
-		this.frame.addEventListener('mouseenter', this._enter);
-		this.frame.addEventListener('mouseleave', this._leave);
+		if (this.interactive) {
+			this.frame.addEventListener('mouseenter', this._enter);
+			this.frame.addEventListener('mouseleave', this._leave);
+		}
 
 		this.frame.appendChild(iframe);
 		this.iframe = iframe;
@@ -59,9 +64,16 @@ export default class Embed {
 		}, this.timeout + (this.handshake ? 0 : 1200));
 	}
 
+	// Render the site at its design width, scaled to the frame's width, and let its viewport be as tall as the
+	// frame needs so the thumbnail is always filled (no blank strip under a short page).
 	_scale() {
 		if (!this.iframe || this.interactive) return;
-		const k = this.frame.clientWidth / this.w;
+		const fw = this.frame.clientWidth;
+		const fh = this.frame.clientHeight;
+		if (!fw) return;
+		const k = fw / this.w;
+		this.iframe.width = this.w;
+		this.iframe.height = fh ? Math.max(this.h, Math.round(fh / k)) : this.h;
 		this.iframe.style.transform = `scale(${k})`;
 	}
 
@@ -77,9 +89,11 @@ export default class Embed {
 	destroy() {
 		clearTimeout(this._timer);
 		window.removeEventListener('message', this._onMessage);
-		this.frame.removeEventListener('mouseenter', this._enter);
-		this.frame.removeEventListener('mouseleave', this._leave);
-		this._leave();
+		if (this.interactive) {
+			this.frame.removeEventListener('mouseenter', this._enter);
+			this.frame.removeEventListener('mouseleave', this._leave);
+			this._leave();
+		}
 		if (this._ro) this._ro.disconnect();
 		if (this.iframe) this.iframe.remove();
 		this.iframe = null;

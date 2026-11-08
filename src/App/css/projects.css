@@ -1,3 +1,8 @@
+/* ==========================================================================
+   Projects: sticky stack of panels. Layout + type here; media, art, depth and
+   reveals live in projects-fx.css.
+   ========================================================================== */
+
 .projects-stack {
 	--strip: 34px;
 
@@ -6,6 +11,22 @@
 	isolation: isolate; /* keep panel stacking local so Awards (z-index 3) still covers the last panel */
 	background: var(--white);
 	color: var(--black);
+
+	/* Panels stick at --nav-h + i * --strip. Reserving --nav-h here puts panel 0 exactly at its stuck
+	   position when the section lands, so it is never pushed down over panel 1's strip. */
+	padding-top: var(--nav-h);
+}
+
+/* The band the fixed nav covers once landed; it only shows while arriving from the Work ledger. */
+.projects-seam {
+	position: absolute;
+	inset: 0 0 auto 0;
+	height: var(--nav-h);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--spacing-sm);
+	padding-inline: var(--page-pad);
 }
 
 .project-panel {
@@ -19,27 +40,63 @@
 	background: var(--white);
 }
 
+/* ---------- Strip (accumulating index) ---------- */
+/* the first strip's rule merges with the nav's own hairline instead of doubling it */
+.is-first .project-strip::before {
+	top: -1px;
+}
+
 .project-strip {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: var(--spacing-sm);
 
 	padding-inline: var(--page-pad);
-	border-top: 1px solid var(--black);
 	line-height: 1;
+}
+
+.project-strip::before {
+	content: '';
+	position: absolute;
+	inset: 0 0 auto;
+	height: 1px;
+	background: var(--black);
+	transform-origin: 0 50%;
+}
+
+.ps-cell {
+	display: block;
+	overflow: hidden;
+	padding-block: 2px;
+}
+
+.ps-t {
+	display: block;
+}
+
+/* ---------- Body ---------- */
+.project-inner {
+	min-height: 0;
+	transform-origin: 50% 0;
 }
 
 .project-body {
 	display: grid;
 	grid-template-columns: repeat(12, minmax(0, 1fr));
+	grid-template-rows: minmax(0, 1fr);
 	gap: var(--spacing-regular);
+	height: 100%;
 	min-height: 0;
 	padding: var(--spacing-sm) var(--page-pad) var(--page-pad);
 }
 
 .project-text {
 	grid-column: 1 / 6;
+	grid-row: 1;
+	container-type: inline-size;
+
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -49,35 +106,40 @@
 
 .project-media {
 	grid-column: 6 / 13;
-	display: grid;
-	grid-template-rows: minmax(0, 1fr) auto;
-	gap: var(--spacing-xs);
+	grid-row: 1;
 	min-height: 0;
-	cursor: pointer;
 }
 
 .project-panel--left .project-text {
-	grid-column: 9 / 13;
-	order: 2;
+	grid-column: 8 / 13;
 }
 
 .project-panel--left .project-media {
-	grid-column: 1 / 9;
-	order: 1;
+	grid-column: 1 / 8;
 }
 
+/* ---------- Type: huge display against small mono and serif ---------- */
 .projects-heading {
 	font-family: var(--family-main);
 	font-weight: 700;
-	font-size: clamp(var(--text-normal), min(16dvh, 12vw), 180px);
+	font-size: clamp(60px, min(19dvh, 15vw), 240px);
+	font-size: clamp(60px, min(27cqw, 19dvh), 240px);
 	line-height: 0.75;
 	margin-bottom: var(--spacing-regular);
 }
 
 .project-title {
 	font-family: var(--family-main);
-	font-size: clamp(40px, min(9dvh, 6vw), 96px);
+	font-weight: 700;
+	font-size: clamp(56px, min(15.5dvh, 11vw), 190px);
+	font-size: clamp(56px, min(26cqw, 15.5dvh), 190px);
 	line-height: 0.8;
+	text-wrap: balance;
+}
+
+.is-first .project-title {
+	font-size: clamp(48px, min(12dvh, 8vw), 150px);
+	font-size: clamp(48px, min(21cqw, 12dvh), 150px);
 }
 
 .project-summary {
@@ -86,18 +148,86 @@
 	font-family: 'Editorial New', serif;
 	font-weight: 200;
 	text-transform: none;
-	font-size: clamp(1.25rem, 2.25rem, 2.25rem);
+	font-size: clamp(1.5rem, 2.8vw, 2.25rem);
 	line-height: 1.13;
 	text-wrap: balance;
 }
 
 .project-text-bottom {
+	position: relative;
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: var(--spacing-regular);
+	padding-top: var(--spacing-sm);
+}
+
+/* hairline above the numeral + meta row; draws in on reveal */
+.project-text-bottom::before {
+	content: '';
+	position: absolute;
+	inset: 0 0 auto;
+	height: 1px;
+	background: var(--black);
+	transform-origin: 0 50%;
+}
+
+.project-num {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--spacing-xs);
+}
+
+.pn-d {
+	display: block;
+	font-family: var(--family-main);
+	font-weight: 700;
+	font-size: clamp(64px, min(19dvh, 14vw), 220px);
+	font-size: clamp(64px, min(30cqw, 19dvh), 220px);
+	line-height: 0.75;
+}
+
+.pn-d .pl-char {
+	display: inline-block;
+}
+
+.pn-cap {
+	display: block;
+	font-family: 'Editorial New', serif;
+	font-weight: 200;
+	font-size: 1.25rem;
+	line-height: 1.3;
+	text-transform: none;
+}
+
+.project-meta {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	gap: var(--spacing-sm);
+	margin-left: auto;
+	padding-bottom: 2px;
 }
 
+.project-tag {
+	display: block;
+}
+
+/* short viewports: the numeral shrinks (and finally leaves) so the stacked panels never overflow */
+@media (max-height: 760px) {
+	.pn-d {
+		font-size: clamp(56px, 14dvh, 120px);
+	}
+}
+
+@media (max-height: 560px) {
+	.project-num {
+		display: none;
+	}
+}
+
+/* ---------- Shared frame: the one sanctioned content window (also used by the detail overlay) ---------- */
 .frame {
 	position: relative;
 	overflow: hidden;
@@ -145,53 +275,14 @@
 	white-space: pre-wrap;
 }
 
-.project-caption {
-	min-height: 1em;
-}
-
-/* ---------- Reveal ---------- */
-.project-text > *,
-.project-caption {
-	opacity: 0;
-	transform: translateY(24px);
-	transition: opacity 800ms var(--ease-out), transform 800ms var(--ease-out);
-}
-
-.project-panel .frame {
-	clip-path: inset(100% 0 0 0);
-	transition: clip-path 1000ms var(--ease-wipe);
-}
-
-.project-panel.is-revealed .project-text > *,
-.project-panel.is-revealed .project-caption {
-	opacity: 1;
-	transform: none;
-}
-
-.project-panel.is-revealed .project-text > :nth-child(2),
-.project-panel.is-revealed .project-caption {
-	transition-delay: 120ms;
-}
-
-.project-panel.is-revealed .frame {
-	clip-path: inset(0);
-}
-
-/* ---------- Mobile: stickiness dropped, single column, poster only ---------- */
+/* ---------- Mid width: keep the 5 / 7 split, tighten ---------- */
 @media (width <= 1080px) {
-	.project-text,
-	.project-panel--left .project-text {
-		grid-column: 1 / 6;
-		order: 0;
-	}
-
-	.project-media,
-	.project-panel--left .project-media {
-		grid-column: 6 / 13;
-		order: 0;
+	.project-body {
+		gap: var(--spacing-sm);
 	}
 }
 
+/* ---------- Mobile: stickiness dropped, single column (heading, media, then numeral + meta), poster only ---------- */
 @media (width <= 750px) {
 	.project-panel {
 		position: relative;
@@ -200,43 +291,52 @@
 	}
 
 	.project-body {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: none;
+		height: auto;
 		padding-top: var(--spacing-regular);
 		padding-bottom: var(--spacing-xl);
+		gap: var(--spacing-regular);
 	}
 
-	.project-text,
-	.project-panel--left .project-text,
-	.project-media,
-	.project-panel--left .project-media {
+	.project-text {
+		display: contents;
+	}
+
+	.project-text-top,
+	.project-text-bottom {
 		grid-column: 1;
 	}
 
+	.project-text-top {
+		grid-row: 1;
+	}
+
 	.project-media,
 	.project-panel--left .project-media {
-		order: 0;
-	}
-
-	.project-text,
-	.project-panel--left .project-text {
-		order: 1;
-	}
-
-	.frame {
-		height: auto;
+		grid-column: 1;
+		grid-row: 2;
 		aspect-ratio: 4 / 3;
 	}
 
-	.project-summary {
-		font-size: 1.75rem;
+	.project-text-bottom {
+		grid-row: 3;
 	}
-}
 
-@media (prefers-reduced-motion: reduce) {
-	.project-text > *,
-	.project-caption,
-	.project-panel .frame,
-	.frame iframe {
-		transition: none;
+	.projects-heading {
+		font-size: clamp(60px, 27vw, 200px);
+	}
+
+	.project-title,
+	.is-first .project-title {
+		font-size: clamp(56px, 22vw, 150px);
+	}
+
+	.pn-d {
+		font-size: clamp(64px, 26vw, 160px);
+	}
+
+	.project-num {
+		display: flex;
 	}
 }
