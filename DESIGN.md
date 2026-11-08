@@ -234,6 +234,10 @@ Documented, not yet changed. These are what a future cleanup would address, pend
 
 ## Work and Projects
 
-- **Embedded work is a window, not a card.** A live-site preview or poster sits in a flat 1px ink frame with a mono caption underneath; it is the one sanctioned content window. Empty or pending media shows the 45° hatch (`.hatch`), never a placeholder box.
-- **Work** is a hairline ledger (index, display name, mono meta, hatch cell). Rows reveal on scroll and expand as an accordion; hover or open washes the row in ink with an orange index.
-- **Projects** are sticky panels whose index strips accumulate under the nav. A click opens a full-screen paper detail page (text left, media right) with Escape, Close, Prev/Next and back-button support.
+Both sections are held to the Awards bar: depth, scroll-coupled lerped motion and pointer coupling, not one-shot fades.
+
+- **Embedded work is a window, not a card.** A live-site preview, poster or code view sits in a flat 1px ink frame inside a perspective field (a hairline tunnel, the Awards grid in miniature), with a black title bar. Pending media shows designed hairline line-art placeholders (browser wireframe, poster board, code/network schematic), not an empty box.
+- **Work** is a title card with a perspective hairline floor, then a ledger whose rows sit in a 3D "drum": each row rotates and recedes by its distance from the reading line. Rows reveal with the ink mask wipe and the orange star riding its edge; hover washes the row in ink from the pointer's side.
+- **Projects** are sticky panels whose index strips accumulate under the nav; the covered panel recedes in perspective. Media tilts toward the pointer (perspective(1000px), up to 12deg) and the cursor dot becomes an ink "Open" disc over it.
+- **Detail page** grows from the thumbnail on the shared `bezier`, stages display type per letter and serif lines through masks, and turns between projects with an ink band and star. Escape, Close, Prev/Next, arrows and the back button all work.
+- Easing: big moves and reveals use the site's shared in-out `bezier` (matches Awards/About); micro-interactions use power3/power4 out.
