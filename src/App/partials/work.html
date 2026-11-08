@@ -1,5 +1,12 @@
 <div class="work-wrapper">
 	<section id="work" class="work">
+		<svg class="work-floor" aria-hidden="true" focusable="false">
+			<path class="work-floor-rules" />
+			<path class="work-floor-cols" />
+			<path class="work-floor-horizon" />
+		</svg>
+		<span class="work-pen" aria-hidden="true"></span>
+
 		<div class="work-large">
 			<div class="work-flex">
 				<span class="work-letters">W</span>
@@ -9,47 +16,69 @@
 			</div>
 		</div>
 
-		<div class="work-small"><span class="underline">Keep Scrolling</span> <span>+</span></div>
+		<div class="work-small">
+			<span class="work-tag">(Index)</span>
+			<span class="work-tag work-cue"><span class="underline">Keep Scrolling</span> <span class="work-star" aria-hidden="true"></span></span>
+			<span class="work-tag work-tag--end">(001 &mdash; 00{{work.length}})</span>
+		</div>
 	</section>
 
-	<section id="work-ledger" class="work-ledger" data-display="block">
-		{{#each work}}
-		<article class="work-row" data-slug="{{slug}}">
-			<h3 class="work-row-title">
-				<button
-					class="work-head"
-					type="button"
-					id="work-head-{{id}}"
-					aria-expanded="false"
-					aria-controls="work-panel-{{id}}"
-				>
-					<span class="work-idx">({{id}})</span>
-					<span class="work-title">{{org}}</span>
-					<span class="work-meta"><span>{{role}}</span><span>{{dates}}</span></span>
-					{{#if image.src}}
-					<span class="work-cell"><img src="{{image.src}}" alt="{{image.alt}}" loading="lazy" /></span>
-					{{else}}
-					<span class="work-cell hatch" aria-hidden="true"></span>
-					{{/if}}
-					<span class="work-toggle" aria-hidden="true">+</span>
-				</button>
-			</h3>
-			<div class="work-panel" id="work-panel-{{id}}" role="region" aria-labelledby="work-head-{{id}}">
-				<div class="work-panel-inner">
-					<div class="work-panel-body">
-						<div class="work-copy">
-							<p class="work-teaser">{{teaser}}</p>
-							{{#each body}}<p class="work-text">{{this}}</p>{{/each}}
+	<section id="work-ledger" class="work-ledger" data-display="block" aria-label="Work ledger">
+		<h2 class="work-bar"><span>Index</span><span>Work</span><span>(001 &mdash; 00{{work.length}})</span></h2>
+
+		<div class="work-rows">
+			{{#each work}}
+			<article class="work-row{{#if feature}} work-row--feature{{/if}}" data-slug="{{slug}}">
+				<span class="work-ink" aria-hidden="true"><i></i></span>
+				<h3 class="work-row-title">
+					<button
+						class="work-head"
+						type="button"
+						id="work-head-{{id}}"
+						aria-expanded="false"
+						aria-controls="work-panel-{{id}}"
+					>
+						<span class="work-wash" aria-hidden="true"></span>
+						<span class="work-inner">
+							<span class="work-idx">({{id}})</span>
+							<span class="work-title">{{org}}</span>
+							<span class="work-meta"><span class="work-line"><span>{{role}}</span></span><span class="work-line"><span>{{dates}}</span></span></span>
+							<span class="work-cell"{{#unless image.src}} aria-hidden="true"{{/unless}}>
+								<span class="work-stage">
+									<span class="work-mat"></span>
+									<span class="work-plate">
+										{{#if image.src}}<img src="{{image.src}}" alt="{{image.alt}}" loading="lazy" />{{else}}<svg class="work-fig" focusable="false"></svg>{{/if}}
+									</span>
+									<span class="work-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+								</span>
+							</span>
+							<span class="work-toggle" aria-hidden="true"></span>
+						</span>
+					</button>
+				</h3>
+				<div class="work-panel" id="work-panel-{{id}}" role="region" aria-labelledby="work-head-{{id}}">
+					<div class="work-panel-inner">
+						<div class="work-panel-body">
+							<div class="work-copy">
+								<p class="work-teaser">{{teaser}}</p>
+								{{#each body}}<p class="work-text">{{this}}</p>{{/each}}
+							</div>
+							<dl class="work-facts">
+								{{#each facts}}
+								<div><dt>{{k}}</dt><dd>{{v}}</dd></div>
+								{{/each}}
+							</dl>
 						</div>
-						<dl class="work-facts">
-							{{#each facts}}
-							<div><dt>{{k}}</dt><dd>{{v}}</dd></div>
-							{{/each}}
-						</dl>
 					</div>
 				</div>
-			</div>
-		</article>
-		{{/each}}
+			</article>
+			{{/each}}
+		</div>
+
+		<div class="work-end" aria-hidden="true">
+			<span>(End)</span>
+			<span class="work-star"></span>
+			<span>Projects</span>
+		</div>
 	</section>
 </div>

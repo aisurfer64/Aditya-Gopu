@@ -1,0 +1,710 @@
+/* ==========================================================================
+   Work: motion + 3D. Everything here is transform / clip-path / opacity only.
+   Driven by Work.js (scroll-coupled drum, pointer tilt) and by `.is-revealed`,
+   `.is-live`, `.is-open` classes (cascade reveals, one --d delay per row).
+   ========================================================================== */
+
+.work-wrapper {
+	/* asset-star.svg, inlined so the path is independent of the deploy base */
+	--star: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 49 49'%3E%3Cpath d='m24.5 0 3.3 21.2L49 24.5l-21.2 3.3L24.5 49l-3.3-21.2L0 24.5l21.2-3.3L24.5 0z'/%3E%3C/svg%3E");
+	--ease-pop: cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.work-sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* ---------- Star (the one orange accent) ---------- */
+.work-star {
+	display: inline-block;
+	width: 1.05em;
+	height: 1.05em;
+	vertical-align: -0.16em;
+	background: var(--orange);
+	-webkit-mask: var(--star) center / contain no-repeat;
+	mask: var(--star) center / contain no-repeat;
+}
+
+/* ---------- Title card ---------- */
+.work-floor {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	/* hidden until the star pen draws it in (Work.js) */
+	clip-path: inset(0 100% 0 0);
+}
+
+.work-floor path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1;
+}
+
+/* the star "pen" that draws the horizon once on enter */
+.work-pen {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 3;
+	width: 30px;
+	height: 30px;
+	margin: -15px 0 0 -15px;
+	background: var(--orange);
+	-webkit-mask: var(--star) center / contain no-repeat;
+	mask: var(--star) center / contain no-repeat;
+	opacity: 0;
+	pointer-events: none;
+	will-change: transform;
+}
+
+.work-letters {
+	backface-visibility: hidden;
+}
+
+/* ---------- Ledger bar ---------- */
+.work-bar {
+	clip-path: inset(0 100% 0 0);
+	transition: clip-path 1300ms var(--bezier);
+}
+
+.work-ledger.is-live .work-bar {
+	clip-path: inset(0);
+}
+
+/* ---------- 3D drum: the rows are planes in a perspective box (transforms set per frame in Work.js) ---------- */
+.work-rows {
+	perspective: 1500px;
+	perspective-origin: 50% 50%;
+}
+
+.work-row {
+	transform-origin: 50% 50%;
+	will-change: transform;
+	background: transparent;
+	transition: scale 450ms var(--ease-pop);
+}
+
+/* press: the whole plane gives under the pointer, like the Awards cells */
+.work-row.is-press {
+	scale: 0.988;
+	transition-duration: 200ms;
+}
+
+/* ---------- Row reveal: ink mask wipes off with the orange star riding it ---------- */
+.work-ink {
+	position: absolute;
+	inset: -1px calc(var(--page-pad) * -1) 0;
+	z-index: 6;
+	background: var(--black);
+	overflow: hidden;
+	clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+	pointer-events: none;
+	will-change: clip-path;
+	transition:
+		clip-path 1200ms var(--bezier) calc(var(--d, 0ms) + 60ms),
+		visibility 0s linear calc(var(--d, 0ms) + 1400ms);
+}
+
+.work-ink i {
+	position: absolute;
+	inset: 0;
+	will-change: transform;
+	transition: transform 1200ms var(--bezier) calc(var(--d, 0ms) + 60ms);
+}
+
+.work-ink i::before {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 2.5rem;
+	height: 2.5rem;
+	margin: -1.25rem 0 0 -1.25rem;
+	background: var(--orange);
+	-webkit-mask: var(--star) center / contain no-repeat;
+	mask: var(--star) center / contain no-repeat;
+	transition: rotate 1200ms var(--bezier) calc(var(--d, 0ms) + 60ms);
+}
+
+.work-row.is-revealed .work-ink {
+	clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%);
+	visibility: hidden;
+}
+
+.work-row.is-revealed .work-ink i {
+	transform: translate3d(50%, 0, 0);
+}
+
+.work-row.is-revealed .work-ink i::before {
+	rotate: 270deg;
+}
+
+/* the content slides in behind the wipe, then settles. The toggle is left out on purpose: a
+   transform would make it a stacking context and break the difference blend on its star. */
+.work-inner > :not(.work-toggle) {
+	translate: -4rem 0;
+	transition: translate 1400ms var(--bezier) calc(var(--d, 0ms) + 60ms);
+}
+
+.work-row.is-revealed .work-inner > :not(.work-toggle) {
+	translate: 0 0;
+}
+
+/* ---------- Ink wash on hover/open, text flips by blend (no duplicated DOM) ---------- */
+.work-wash {
+	position: absolute;
+	inset: 0 calc(var(--page-pad) * -1);
+	z-index: -1;
+	background: var(--black);
+	clip-path: inset(0 100% 0 0);
+	pointer-events: none;
+}
+
+.work-idx,
+.work-title,
+.work-meta {
+	color: var(--white);
+	mix-blend-mode: difference;
+}
+
+/* ---------- Title: per-letter rise + hover roll ---------- */
+.work-word {
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.work-char {
+	display: inline-block;
+	height: 0.96em;
+	overflow: hidden;
+	vertical-align: top;
+	padding-block: 0.08em;
+	margin-block: -0.08em;
+}
+
+.work-in {
+	display: block;
+	transform: translateY(112%);
+	transition: transform 1100ms var(--bezier) calc(var(--d, 0ms) + 240ms + var(--c, 0) * 28ms);
+}
+
+.work-row.is-revealed .work-in {
+	transform: none;
+}
+
+.work-roll {
+	display: block;
+	transition: transform 650ms var(--ease-pop) calc(var(--c, 0) * 16ms);
+}
+
+.work-roll i {
+	display: block;
+	height: 1.1em;
+	font-style: normal;
+	line-height: 0.8;
+}
+
+@media (hover: hover) {
+	.work-head:hover .work-roll {
+		transform: translateY(-50%);
+	}
+}
+
+/* ---------- Index: odometer ---------- */
+.work-odo {
+	display: inline-flex;
+}
+
+.work-dig {
+	display: inline-block;
+	height: 1em;
+	overflow: hidden;
+	vertical-align: top;
+	line-height: 1;
+}
+
+.work-reel {
+	display: block;
+	transition: transform 1700ms var(--bezier) calc(var(--d, 0ms) + 220ms + var(--p, 0) * 120ms);
+}
+
+.work-reel b {
+	display: block;
+	height: 1em;
+	font-weight: inherit;
+}
+
+.work-row.is-revealed .work-reel {
+	transform: translateY(calc(var(--n, 0) * -1em));
+}
+
+/* ---------- Meta: masked lines ---------- */
+.work-line {
+	display: block;
+	overflow: hidden;
+	padding-block: 0.2em;
+	margin-block: -0.2em;
+}
+
+.work-line > span {
+	display: block;
+	transform: translateY(120%);
+	transition: transform 1100ms var(--bezier) calc(var(--d, 0ms) + 420ms);
+}
+
+.work-line:nth-child(2) > span {
+	transition-delay: calc(var(--d, 0ms) + 500ms);
+}
+
+.work-row.is-revealed .work-line > span {
+	transform: none;
+}
+
+/* ---------- Toggle: a four-point star, black on paper / white on ink, orange when engaged ---------- */
+.work-toggle {
+	width: 20px;
+	height: 20px;
+}
+
+.work-toggle::before,
+.work-toggle::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	-webkit-mask: var(--star) center / contain no-repeat;
+	mask: var(--star) center / contain no-repeat;
+	transition:
+		rotate 700ms var(--bezier),
+		scale 350ms var(--ease-pop);
+}
+
+/* black on paper / white on ink via difference; pops in with the row reveal */
+.work-toggle::before {
+	background: var(--white);
+	mix-blend-mode: difference;
+	scale: 0;
+	transition:
+		rotate 700ms var(--bezier),
+		scale 900ms var(--bezier) calc(var(--d, 0ms) + 1300ms);
+}
+
+.work-row.is-revealed .work-toggle::before {
+	scale: 1;
+}
+
+.work-toggle::after {
+	background: var(--orange);
+	scale: 0;
+}
+
+.work-row.is-open .work-toggle::before,
+.work-row.is-open .work-toggle::after {
+	rotate: 225deg;
+}
+
+.work-row.is-open .work-toggle::after,
+.work-head:focus-visible .work-toggle::after {
+	scale: 1;
+}
+
+@media (hover: hover) {
+	.work-head:hover .work-toggle::before,
+	.work-head:hover .work-toggle::after {
+		rotate: 90deg;
+	}
+
+	.work-head:hover .work-toggle::after {
+		scale: 1;
+	}
+
+	.work-row.is-open .work-head:hover .work-toggle::before,
+	.work-row.is-open .work-head:hover .work-toggle::after {
+		rotate: 225deg;
+	}
+}
+
+/* burst stars (spawned by Work.js on open) */
+.work-row.is-bursting {
+	z-index: 7;
+}
+
+.work-bit {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	z-index: 9;
+	background: var(--orange);
+	-webkit-mask: var(--star) center / contain no-repeat;
+	mask: var(--star) center / contain no-repeat;
+	pointer-events: none;
+}
+
+/* ---------- Image cell: a small 3D stage (hatch mat, plate, sparkles at three depths) ---------- */
+.work-cell {
+	perspective: 900px;
+}
+
+.work-stage {
+	position: absolute;
+	inset: 0;
+	transform-style: preserve-3d;
+	will-change: transform;
+}
+
+.work-mat {
+	position: absolute;
+	inset: 0;
+	border: 1px solid var(--black);
+	background-color: var(--white);
+	background-image: repeating-linear-gradient(
+		-45deg,
+		transparent,
+		transparent 1px,
+		var(--black) 1.5px,
+		var(--black) 2.5px,
+		transparent 3px,
+		var(--white) 11px
+	);
+	translate: 0 0 -22px;
+	scale: 1.03;
+	clip-path: inset(0 100% 0 0);
+	transition: clip-path 1300ms var(--bezier) calc(var(--d, 0ms) + 640ms);
+}
+
+.work-plate {
+	position: absolute;
+	inset: clamp(8px, 7%, 14px);
+	border: 1px solid var(--black);
+	background: var(--white);
+	overflow: hidden;
+	clip-path: inset(100% 0 0 0);
+	transition: clip-path 1300ms var(--bezier) calc(var(--d, 0ms) + 820ms);
+}
+
+.work-row.is-revealed .work-mat,
+.work-row.is-revealed .work-plate {
+	clip-path: inset(0);
+}
+
+.work-fig {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+}
+
+.work-sparks {
+	position: absolute;
+	inset: clamp(8px, 7%, 14px);
+	translate: 0 0 26px;
+	pointer-events: none;
+}
+
+.work-sparks i {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	background: var(--black);
+	-webkit-mask: var(--star) center / contain no-repeat;
+	mask: var(--star) center / contain no-repeat;
+	scale: 0;
+	rotate: -90deg;
+	transition:
+		scale 900ms var(--bezier) calc(var(--d, 0ms) + 1300ms),
+		rotate 900ms var(--bezier) calc(var(--d, 0ms) + 1300ms);
+}
+
+.work-sparks i:nth-child(1) {
+	top: -6px;
+	left: -6px;
+}
+
+.work-sparks i:nth-child(2) {
+	top: -6px;
+	right: -6px;
+}
+
+.work-sparks i:nth-child(3) {
+	bottom: -6px;
+	left: -6px;
+	transition-delay: calc(var(--d, 0ms) + 1380ms);
+}
+
+.work-sparks i:nth-child(4) {
+	bottom: -6px;
+	right: -6px;
+	transition-delay: calc(var(--d, 0ms) + 1460ms);
+}
+
+.work-row.is-revealed .work-sparks i {
+	scale: 1;
+	rotate: 0deg;
+}
+
+/* line-art: drawn in once, then alive while the row is on screen */
+.work-fig path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1;
+}
+
+.work-fig .d {
+	stroke-dasharray: 1;
+	stroke-dashoffset: 1;
+	transition: stroke-dashoffset 1500ms var(--bezier) calc(var(--d, 0ms) + 800ms + var(--k, 0) * 80ms);
+}
+
+.work-row.is-revealed .work-fig .d {
+	stroke-dashoffset: 0;
+}
+
+.work-fig .l {
+	vector-effect: non-scaling-stroke;
+	opacity: 0;
+	transition: opacity 900ms linear calc(var(--d, 0ms) + 1400ms);
+}
+
+.work-row.is-revealed .work-fig .l {
+	opacity: 1;
+}
+
+.work-row:not(.is-live) .work-fig * {
+	animation-play-state: paused;
+}
+
+.wf-sphere {
+	rotate: -16deg;
+	animation: wf-tip 9s ease-in-out infinite alternate;
+}
+
+.wf-mer {
+	animation: wf-mer 7s infinite;
+	animation-delay: calc(var(--i, 0) * -2.333s);
+}
+
+.wf-flow {
+	animation: wf-flow 5.6s cubic-bezier(0.5, 0.05, 0.9, 0.55) infinite;
+	animation-delay: calc(var(--i, 0) * -1.4s);
+}
+
+.wf-scan {
+	animation: wf-scan 3.4s cubic-bezier(0.5, 0, 0.9, 0.5) infinite;
+}
+
+.wf-ring {
+	animation: wf-ring 4.6s ease-in-out infinite alternate;
+	animation-delay: calc(var(--i, 0) * -0.55s);
+}
+
+.wf-spin {
+	animation: wf-spin 38s linear infinite;
+}
+
+@keyframes wf-tip {
+	from {
+		rotate: -24deg;
+	}
+	to {
+		rotate: -8deg;
+	}
+}
+
+@keyframes wf-mer {
+	0% {
+		transform: scaleX(1);
+		animation-timing-function: ease-in;
+	}
+	50% {
+		transform: scaleX(0.02);
+		animation-timing-function: ease-out;
+	}
+	100% {
+		transform: scaleX(1);
+	}
+}
+
+@keyframes wf-flow {
+	0% {
+		transform: scale(0.14);
+		opacity: 0;
+	}
+	12% {
+		opacity: 1;
+	}
+	82% {
+		opacity: 1;
+	}
+	100% {
+		transform: scale(1);
+		opacity: 0;
+	}
+}
+
+@keyframes wf-scan {
+	0% {
+		transform: translateY(0);
+		opacity: 0;
+	}
+	15% {
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(var(--dy, 40px));
+		opacity: 1;
+	}
+}
+
+@keyframes wf-ring {
+	from {
+		transform: scaleY(0.5);
+	}
+	to {
+		transform: scaleY(1.9);
+	}
+}
+
+@keyframes wf-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* ---------- Accordion choreography ---------- */
+.work-panel-body {
+	transform-origin: 50% 0;
+	transform: perspective(1400px) rotateX(-72deg);
+	transition: transform 600ms var(--ease-pop);
+}
+
+.work-row.is-open .work-panel-body {
+	transform: perspective(1400px) rotateX(0deg);
+	transition: transform 1300ms var(--bezier) 120ms;
+}
+
+.ww {
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: top;
+	padding-block: 0.14em;
+	margin-block: -0.14em;
+}
+
+.wi {
+	display: inline-block;
+	transform: translateY(115%);
+	transition: transform 420ms var(--ease-pop);
+}
+
+.work-row.is-open .wi {
+	transform: none;
+	transition: transform 1100ms var(--bezier) calc(260ms + var(--w, 0) * 38ms);
+}
+
+.work-facts div {
+	overflow: hidden;
+}
+
+.work-facts div > * {
+	display: block;
+	transform: translateY(120%);
+	transition: transform 420ms var(--ease-pop);
+}
+
+.work-facts div::after {
+	content: '';
+	position: absolute;
+	inset: auto 0 0;
+	height: 1px;
+	background: var(--black);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform 400ms var(--ease-pop);
+}
+
+.work-facts div {
+	flex-wrap: nowrap;
+}
+
+.work-row.is-open .work-facts div > * {
+	transform: none;
+	transition: transform 1000ms var(--bezier) calc(420ms + var(--f, 0) * 110ms);
+}
+
+.work-row.is-open .work-facts div::after {
+	transform: scaleX(1);
+	transition: transform 1200ms var(--bezier) calc(300ms + var(--f, 0) * 110ms);
+}
+
+/* ---------- Ledger foot ---------- */
+.work-end .work-star {
+	font-size: 15px;
+}
+
+/* ---------- Narrow screens: simplified 3D (no tilt, flatter drum), touch has no hover wash ---------- */
+@media (width <= 750px) {
+	.work-sparks i {
+		width: 10px;
+		height: 10px;
+	}
+
+	.work-ink i::before {
+		width: 2rem;
+		height: 2rem;
+		margin: -1rem 0 0 -1rem;
+	}
+
+	.work-inner > :not(.work-toggle) {
+		translate: -1.5rem 0;
+	}
+}
+
+/* ---------- Reduced motion: static, fully drawn, no loops ---------- */
+@media (prefers-reduced-motion: reduce) {
+	.work-ink {
+		display: none;
+	}
+
+	.work-bar,
+	.work-in,
+	.work-roll,
+	.work-reel,
+	.work-line > span,
+	.work-inner > *,
+	.work-mat,
+	.work-plate,
+	.work-sparks i,
+	.work-fig .d,
+	.work-fig .l,
+	.work-panel,
+	.work-panel-body,
+	.wi,
+	.work-facts div > *,
+	.work-facts div::after,
+	.work-toggle::before,
+	.work-toggle::after,
+	.work-row {
+		transition: none !important;
+	}
+
+	.work-fig *,
+	.work-fig {
+		animation: none !important;
+	}
+
+	.work-bar {
+		clip-path: inset(0);
+	}
+
+	.work-panel-body {
+		transform: none;
+	}
+}
