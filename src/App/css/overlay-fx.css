@@ -1,0 +1,468 @@
+/* ==========================================================================
+   Overlay effects: the orange star, the ink band, the shared-element ghost, and the
+   hairline line-art placeholders (they sit in layers at different translateZ).
+   ========================================================================== */
+
+.ov-star {
+	display: block;
+	background: var(--orange);
+	-webkit-mask: url('/images/asset-star.svg') center / contain no-repeat;
+	mask: url('/images/asset-star.svg') center / contain no-repeat;
+}
+
+/* the Awards mask, generalised: a black band with a star riding its middle */
+.ov-band {
+	position: absolute;
+	inset: 0;
+	z-index: 8;
+	background: var(--black);
+	pointer-events: none;
+}
+
+.ov-band-star {
+	position: absolute;
+	top: 50%;
+	left: 0;
+}
+
+/* the thumbnail's hatch frame, flying to / from the media pane */
+.ov-hatch {
+	background: repeating-linear-gradient(
+		-45deg,
+		transparent,
+		transparent 1px,
+		var(--black) 1.5px,
+		var(--black) 2.5px,
+		transparent 3px,
+		var(--white) 11px
+	);
+}
+
+.ov-ghost,
+.ov-edge {
+	position: absolute;
+	border: 1px solid var(--black);
+	pointer-events: none;
+}
+
+.ov-ghost {
+	z-index: 7;
+}
+
+/* hairline edge of the growing / shrinking paper window */
+.ov-edge {
+	z-index: 9;
+}
+
+/* ---------- line-art placeholders ---------- */
+
+.ov-art {
+	position: absolute;
+	inset: 0;
+	padding: 6% 7%;
+	transform-style: preserve-3d;
+	pointer-events: none;
+}
+
+.ov-art--network {
+	padding: 6%;
+}
+
+.ov-sheet {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	background: var(--white);
+	border: 1px solid var(--black);
+	transform-style: preserve-3d;
+}
+
+.ov-art--poster .ov-sheet {
+	width: auto;
+	max-width: 100%;
+	height: 100%;
+	margin-inline: auto;
+	aspect-ratio: 3 / 4;
+}
+
+.ov-lay {
+	position: absolute;
+	inset: 0;
+	transform: translateZ(var(--z, 0px));
+	transform-style: preserve-3d;
+}
+
+.ov-chrome {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	height: 30px;
+	padding: 0 10px;
+	border-bottom: 1px solid var(--black);
+}
+
+.ov-chrome i {
+	flex: none;
+	width: 8px;
+	height: 8px;
+	border: 1px solid var(--black);
+}
+
+.ov-url {
+	flex: 1;
+	min-width: 0;
+	height: 16px;
+	margin-left: 8px;
+	padding: 0 8px;
+	overflow: hidden;
+	border: 1px solid var(--black);
+	font-family: var(--family-secondary);
+	font-size: 11px;
+	line-height: 14px;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.ov-canvas {
+	position: absolute;
+	inset: 30px 0 0;
+	transform-style: preserve-3d;
+}
+
+.ov-art--poster .ov-canvas {
+	inset: 0;
+}
+
+.ov-art svg path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1px;
+}
+
+/* hatch-filled bars stand in for display type, plain rules for copy */
+.ov-a-hero u,
+.ov-a-ln u {
+	display: block;
+	border: 1px solid var(--black);
+	background: repeating-linear-gradient(-45deg, transparent, transparent 1px, var(--black) 1.5px, var(--black) 2.5px, transparent 3px, var(--white) 8px);
+}
+
+.ov-a-copy s,
+.ov-a-kick s {
+	display: block;
+	height: 1px;
+	margin-top: 12px;
+	background: var(--black);
+	text-decoration: none;
+}
+
+.ov-a-copy s:nth-child(1) {
+	width: 100%;
+}
+
+.ov-a-copy s:nth-child(2) {
+	width: 92%;
+}
+
+.ov-a-copy s:nth-child(3) {
+	width: 97%;
+}
+
+.ov-a-copy s:nth-child(4) {
+	width: 74%;
+}
+
+.ov-a-copy s:nth-child(5) {
+	width: 58%;
+}
+
+/* browser */
+.ov-a-nav {
+	inset: 5% 6% auto;
+	display: flex;
+	align-items: center;
+	gap: 5%;
+	height: 16px;
+}
+
+.ov-a-nav b {
+	display: block;
+	width: 9%;
+	height: 1px;
+	background: var(--black);
+}
+
+.ov-a-nav b:first-child {
+	width: 16px;
+	height: 16px;
+	background: none;
+	border: 1px solid var(--black);
+}
+
+.ov-art--browser .ov-a-hero {
+	inset: 18% auto auto 6%;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	width: 55%;
+}
+
+.ov-art--browser .ov-a-hero u {
+	height: clamp(26px, 8dvh, 66px);
+}
+
+.ov-art--browser .ov-a-hero u:nth-child(2) {
+	width: 82%;
+}
+
+.ov-art--browser .ov-a-hero u:nth-child(3) {
+	width: 58%;
+}
+
+.ov-art--browser .ov-a-copy {
+	inset: auto auto 9% 6%;
+	width: 36%;
+}
+
+.ov-a-shot {
+	inset: 18% 6% auto auto;
+	width: 30%;
+	aspect-ratio: 4 / 5;
+	background: var(--white);
+	border: 1px solid var(--black);
+}
+
+.ov-a-shot svg {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.ov-a-cols {
+	inset: auto 6% 9% auto;
+	display: flex;
+	gap: 3%;
+	width: 44%;
+	height: 22%;
+}
+
+.ov-a-cols div {
+	flex: 1;
+	border: 1px solid var(--black);
+}
+
+.ov-a-pin {
+	inset: auto;
+	top: 11%;
+	right: 4%;
+	width: 30px;
+	height: 30px;
+}
+
+.ov-a-pin .ov-star {
+	width: 100%;
+	height: 100%;
+}
+
+/* poster */
+.ov-a-marks i {
+	position: absolute;
+	width: 10px;
+	height: 10px;
+	border: 0 solid var(--black);
+}
+
+.ov-a-marks i:nth-child(1) {
+	top: -14px;
+	left: -14px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+}
+
+.ov-a-marks i:nth-child(2) {
+	top: -14px;
+	right: -14px;
+	border-left-width: 1px;
+	border-bottom-width: 1px;
+}
+
+.ov-a-marks i:nth-child(3) {
+	bottom: -14px;
+	left: -14px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+}
+
+.ov-a-marks i:nth-child(4) {
+	right: -14px;
+	bottom: -14px;
+	border-top-width: 1px;
+	border-left-width: 1px;
+}
+
+.ov-a-kick {
+	inset: 4% 8% auto;
+}
+
+.ov-art--poster .ov-a-hero {
+	inset: 11% 8% auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.ov-art--poster .ov-a-hero u {
+	height: clamp(22px, 6dvh, 48px);
+}
+
+.ov-art--poster .ov-a-hero u:nth-child(2) {
+	width: 70%;
+}
+
+.ov-art--poster .ov-a-shot {
+	inset: 34% 8% 31% 8%;
+	width: auto;
+	aspect-ratio: auto;
+}
+
+.ov-art--poster .ov-a-copy {
+	inset: auto 53% 11% 8%;
+}
+
+.ov-art--poster .ov-a-copy--b {
+	inset: auto 8% 11% 53%;
+}
+
+.ov-a-foot {
+	inset: auto 8% 4%;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: 14px;
+}
+
+.ov-a-foot b {
+	display: block;
+	width: 10px;
+	height: 10px;
+	border: 1px solid var(--black);
+}
+
+.ov-a-foot s {
+	display: block;
+	flex: 1;
+	height: 1px;
+	background: var(--black);
+	text-decoration: none;
+}
+
+.ov-art--poster .ov-a-pin {
+	top: 5%;
+	right: 6%;
+}
+
+/* code */
+.ov-a-code {
+	inset: 4% 4%;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(7px, 1.9dvh, 16px);
+}
+
+.ov-a-ln {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	height: 12px;
+	font-family: var(--family-secondary);
+	font-size: 11px;
+	line-height: 12px;
+}
+
+.ov-a-ln em {
+	flex: none;
+	width: 20px;
+	font-style: normal;
+}
+
+.ov-a-ln u {
+	height: 7px;
+}
+
+.ov-a-ln code {
+	font-family: var(--family-secondary);
+	font-size: 13px;
+	text-transform: none;
+}
+
+.ov-art--code .ov-a-pin {
+	top: 14%;
+	right: 6%;
+}
+
+/* neural network */
+.ov-a-edges svg {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.ov-a-layer b {
+	position: absolute;
+	display: block;
+	width: 16px;
+	height: 16px;
+	margin: -8px 0 0 -8px;
+	background: var(--white);
+	border: 1px solid var(--black);
+}
+
+.ov-a-layer b .ov-star {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 32px;
+	height: 32px;
+	translate: -50% -50%;
+}
+
+.ov-a-snip {
+	inset: auto 4% 4% auto;
+	width: 36%;
+	height: auto;
+	padding: 8px 10px;
+	background: var(--white);
+	border: 1px solid var(--black);
+}
+
+.ov-a-snip code {
+	font-family: var(--family-secondary);
+	font-size: 12px;
+	line-height: 1.3;
+	text-transform: none;
+}
+
+@media (width <= 750px) {
+	.ov-art {
+		padding: 5%;
+	}
+
+	.ov-art--browser .ov-a-hero {
+		gap: 9px;
+	}
+
+	.ov-art--browser .ov-a-hero u {
+		height: clamp(18px, 5dvh, 36px);
+	}
+
+	.ov-art--poster .ov-a-hero u {
+		height: clamp(16px, 4.2dvh, 30px);
+	}
+
+	.ov-a-code {
+		gap: 8px;
+	}
+}

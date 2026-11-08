@@ -1,40 +1,62 @@
+/* ==========================================================================
+   Project chapter page. Paper and ink, orange only as accent. Display type for what it is,
+   mono for where / which, serif for the quiet sentence. See OverlayPage.js / Overlay.js.
+   ========================================================================== */
+
 .overlay {
+	--ov-bar: 56px;
+	--ov-pad: var(--page-pad);
+	--ov-ease: cubic-bezier(0.76, 0, 0.24, 1);
+	--ov-out: cubic-bezier(0.165, 0.84, 0.44, 1);
+	--ov-title: clamp(64px, min(17dvh, 9.2vw), 210px);
+	--ov-next: clamp(56px, min(13dvh, 7.2vw), 160px);
+	--ov-media-pad-y: clamp(24px, 5dvh, 56px);
+	--ov-media-pad-x: clamp(24px, 3.2vw, 56px);
+
 	position: fixed;
 	inset: 0;
 	z-index: 500;
-
-	display: grid;
-	grid-template-rows: var(--ov-bar) minmax(0, 1fr);
-
-	--ov-bar: 56px;
-
-	background: var(--white);
 	color: var(--black);
 }
 
+.overlay ::selection {
+	background: var(--black);
+	color: var(--white);
+}
+
+.ov-shell {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-rows: var(--ov-bar) minmax(0, 1fr);
+	background: var(--white);
+	overflow: hidden;
+}
+
+/* ---------- bar ---------- */
+
 .ov-bar {
+	position: relative;
+	z-index: 6;
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	gap: var(--spacing-regular);
+	padding-inline: var(--ov-pad);
+	background: var(--white);
+	line-height: 1;
+}
+
+.ov-bar-l {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: var(--spacing-regular);
-
-	padding-inline: var(--page-pad);
-	border-bottom: 1px solid var(--black);
+	gap: var(--spacing-sm);
+	white-space: nowrap;
 }
 
-.ov-bar button {
-	font: inherit;
-	color: inherit;
-	text-transform: inherit;
-	background: none;
-	border: 0;
-	cursor: pointer;
-	padding: var(--spacing-xs) 0;
-}
-
-.ov-bar button:focus-visible {
-	outline: 1px solid var(--orange);
-	outline-offset: 2px;
+.ov-idx,
+.ov-count {
+	display: inline-flex;
 }
 
 .ov-nav {
@@ -42,153 +64,782 @@
 	gap: var(--spacing-regular);
 }
 
+.ov-bar-r {
+	justify-self: end;
+}
+
+.ov-rule,
+.ov-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: block;
+	transform-origin: left center;
+	pointer-events: none;
+}
+
+.ov-rule {
+	height: 1px;
+	background: var(--black);
+}
+
+/* reading progress: the one orange line, scaled by the text pane's scroll */
+.ov-progress {
+	height: 2px;
+	background: var(--orange);
+	transform: scaleX(0);
+}
+
+.ov-btn {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
+	padding: 0 var(--spacing-xs);
+	font: inherit;
+	color: inherit;
+	text-transform: inherit;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	transition: scale 160ms var(--ov-out);
+}
+
+.ov-btn:active {
+	scale: 0.93;
+}
+
+.ov-btn:focus-visible,
+.ov-link:focus-visible,
+.ov-row:focus-visible,
+.ov-next:focus-visible,
+.ov-fbar a:focus-visible,
+.ov-fallback:focus-visible {
+	outline: 1px solid var(--orange);
+	outline-offset: 3px;
+}
+
+/* the site's hover underline: scales in from 0 to 1 on X, clipped by overflow */
+.ov-u {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: top;
+}
+
+.ov-u::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 1px;
+	background: currentColor;
+	transform: scaleX(0);
+	transform-origin: left center;
+	transition: transform 250ms var(--ov-out);
+}
+
+.ov-btn:hover .ov-u::after,
+.ov-btn:focus-visible .ov-u::after,
+a.ov-u:hover::after,
+a.ov-u:focus-visible::after {
+	transform: scaleX(1);
+}
+
+/* rolling counter */
+.ov-rc {
+	position: relative;
+	display: inline-block;
+	height: 1em;
+	overflow: hidden;
+	line-height: 1;
+}
+
+.ov-rc-s {
+	display: flex;
+	flex-direction: column;
+}
+
+.ov-rc-s > span {
+	display: block;
+	height: 1em;
+	line-height: 1;
+}
+
+/* ---------- pages ---------- */
+
 .ov-main {
-	display: grid;
-	grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
-	min-height: 0;
-}
-
-.ov-text {
-	overflow-y: auto;
-	overscroll-behavior: contain;
-	padding: var(--spacing-lg) var(--page-pad);
-	border-right: 1px solid var(--black);
-}
-
-.ov-media {
-	display: grid;
-	grid-template-rows: auto minmax(0, 1fr);
+	position: relative;
 	min-height: 0;
 	overflow: hidden;
+	isolation: isolate;
 }
 
-.ov-mediabar {
+.ov-page {
+	position: absolute;
+	inset: 0;
+	background: var(--white);
+}
+
+.ov-page-in {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+
+.ov-main.is-turning {
+	pointer-events: none;
+}
+
+.ov-main.is-turning .ov-page-in {
+	will-change: transform;
+}
+
+/* the divider between the panes draws itself downward */
+.ov-vr {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: calc(100% * 5 / 12);
+	z-index: 2;
+	width: 1px;
+	background: var(--black);
+	transform-origin: center top;
+	pointer-events: none;
+}
+
+/* ---------- text pane ---------- */
+
+.ov-text {
+	position: relative;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: none;
+}
+
+.ov-text::-webkit-scrollbar {
+	display: none;
+}
+
+.ov-text:focus-visible {
+	outline: 1px solid var(--orange);
+	outline-offset: -3px;
+}
+
+.ov-text-in {
+	display: flex;
+	flex-direction: column;
+	padding: var(--spacing-regular) var(--ov-pad) 0;
+}
+
+.ov-kicker {
+	position: relative;
 	display: flex;
 	justify-content: space-between;
 	gap: var(--spacing-sm);
-	padding: var(--spacing-xs) var(--page-pad);
-	border-bottom: 1px solid var(--black);
+	padding-bottom: var(--spacing-xs);
+	font-size: var(--text-xs);
+	line-height: 1;
 }
 
-.ov-stage {
-	position: relative;
-	min-height: 0;
-	overflow: auto;
-	overscroll-behavior: contain;
-}
-
-.ov-stage .frame {
-	height: 100%;
-	border: 0;
-	clip-path: none;
-}
-
-.ov-stage iframe {
-	pointer-events: auto !important; /* beat style.css .lenis-scrolling iframe rule */
-	width: 100%;
-	height: 100%;
-}
-
-.ov-stage .frame img {
-	height: auto;
-	object-fit: contain;
-}
-
-.ov-stage .frame .code {
-	font-size: var(--text-sm);
-}
-
-.ov-fallback {
+.ov-kicker::after {
+	content: '';
 	position: absolute;
-	left: var(--page-pad);
-	bottom: var(--page-pad);
-	padding: var(--spacing-xs) var(--spacing-sm);
-	background: var(--white);
-	font-family: 'Editorial New', serif;
-	font-weight: 200;
-	text-transform: none;
-	font-size: 1.25rem;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 1px;
+	background: var(--black);
+	transform-origin: left center;
+}
+
+.ov-k {
+	display: block;
 }
 
 .ov-title {
+	margin-top: var(--spacing-regular);
 	font-family: var(--family-main);
-	font-size: clamp(56px, 8vw, 140px);
-	line-height: 0.8;
+	font-weight: 700;
+	font-size: var(--ov-title);
+	line-height: 0.78;
+	letter-spacing: 0;
+	text-transform: uppercase;
+	overflow-wrap: anywhere;
+}
+
+.ov-w {
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.ov-ch {
+	display: inline-block;
+}
+
+/* every serif line sits in its own mask; the line inside slides */
+.ov-ln {
+	display: block;
+	overflow: hidden;
+	padding-block: 0.14em;
+	margin-block: -0.14em;
+}
+
+.ov-ln-in {
+	display: block;
+}
+
+.ov-summary .ov-ln-in,
+.ov-body .ov-ln-in {
+	white-space: nowrap;
 }
 
 .ov-summary {
 	margin-top: var(--spacing-regular);
 	font-family: 'Editorial New', serif;
 	font-weight: 200;
-	text-transform: none;
 	font-size: 2.25rem;
 	line-height: 1.13;
+	text-transform: none;
 	text-wrap: balance;
+}
+
+.ov-body {
+	margin-top: var(--spacing-sm);
+	max-width: 60ch;
 }
 
 .ov-body p {
 	margin-top: var(--spacing-sm);
-	max-width: 60ch;
 	font-family: 'Editorial New', serif;
 	font-weight: 200;
-	text-transform: none;
 	font-size: 1.25rem;
 	line-height: 1.3;
+	text-transform: none;
 }
 
 .ov-facts {
 	margin-top: var(--spacing-lg);
-	display: flex;
-	flex-direction: column;
-	gap: var(--spacing-xs);
 }
 
-.ov-facts div {
+.ov-fact {
+	position: relative;
 	display: flex;
 	gap: var(--spacing-sm);
-	padding-bottom: var(--spacing-xs);
-	border-bottom: 1px solid var(--black);
+	padding: 11px 0 10px;
+	font-size: var(--text-xs);
+	line-height: 1;
 }
 
-.ov-facts dt {
-	min-width: 6rem;
+.ov-fact::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 1px;
+	background: var(--black);
+	transform-origin: left center;
+}
+
+.ov-fact dt {
+	flex: none;
+	width: 7rem;
 }
 
 .ov-links {
 	margin-top: var(--spacing-lg);
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: var(--spacing-sm);
 }
 
-@media (width <= 767px) {
+.ov-link {
+	display: inline-block;
+	line-height: 1;
+	transition: scale 160ms var(--ov-out);
+}
+
+.ov-link:active {
+	scale: 0.95;
+}
+
+.ov-link .ov-ln {
+	padding-block: 0.3em;
+	margin-block: -0.3em;
+}
+
+/* index of every chapter: hairline rows that wash to ink */
+.ov-index {
+	margin-top: var(--spacing-xl);
+}
+
+.ov-label {
+	padding-bottom: var(--spacing-xs);
+	font-size: var(--text-xs);
+	line-height: 1;
+}
+
+.ov-row {
+	position: relative;
+	display: grid;
+	grid-template-columns: 18px 4.2rem minmax(0, 1fr) auto;
+	align-items: center;
+	gap: var(--spacing-xs);
+	min-height: 48px;
+	margin-inline: calc(var(--ov-pad) * -1);
+	padding-inline: var(--ov-pad);
+	font-size: var(--text-xs);
+	line-height: 1;
+	isolation: isolate;
+}
+
+.ov-row::before,
+.ov-row::after {
+	content: '';
+	position: absolute;
+}
+
+.ov-row::before {
+	top: 0;
+	left: var(--ov-pad);
+	right: var(--ov-pad);
+	height: 1px;
+	background: var(--black);
+	transform-origin: left center;
+	transition: transform 1000ms var(--ov-ease) calc(var(--k, 0) * 70ms);
+}
+
+.ov-row::after {
+	inset: 0;
+	z-index: -1;
+	background: var(--black);
+	clip-path: inset(100% 0 0 0);
+	transition: clip-path 450ms var(--ov-ease);
+}
+
+.ov-row:hover::after,
+.ov-row:focus-visible::after {
+	clip-path: inset(0);
+}
+
+.ov-row:hover,
+.ov-row:focus-visible {
+	color: var(--white);
+}
+
+.ov-row:hover .ov-row-id,
+.ov-row:focus-visible .ov-row-id {
+	color: var(--orange);
+}
+
+.ov-row-star {
+	width: 14px;
+	height: 14px;
+	transform: scale(0) rotate(-120deg);
+	transition: transform 600ms var(--ov-ease);
+}
+
+.ov-row.is-current .ov-row-star,
+.ov-row:hover .ov-row-star,
+.ov-row:focus-visible .ov-row-star {
+	transform: none;
+}
+
+.ov-row-t {
+	text-transform: uppercase;
+}
+
+.ov-index:not(.is-in) .ov-row::before {
+	transform: scaleX(0);
+}
+
+.ov-index .ov-ln-in {
+	transition: transform 900ms var(--ov-out) calc(var(--k, 0) * 70ms + 140ms);
+}
+
+.ov-index:not(.is-in) .ov-ln-in {
+	transform: translateY(110%);
+}
+
+.ov-index li:last-child {
+	border-bottom: 1px solid var(--black);
+}
+
+/* next chapter: huge display name; hover washes the block to ink and spins the star in */
+.ov-next {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: var(--spacing-regular);
+	min-height: 64dvh;
+	margin: var(--spacing-xl) calc(var(--ov-pad) * -1) 0;
+	padding: var(--spacing-sm) var(--ov-pad) var(--ov-pad);
+	overflow: hidden;
+	isolation: isolate;
+	transition: color 0ms linear 220ms;
+}
+
+.ov-next-wash {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: var(--black);
+	clip-path: inset(100% 0 0 0);
+	transition: clip-path 800ms var(--ov-ease);
+}
+
+.ov-next:hover .ov-next-wash,
+.ov-next:focus-visible .ov-next-wash {
+	clip-path: inset(0);
+}
+
+.ov-next:hover,
+.ov-next:focus-visible {
+	color: var(--white);
+}
+
+.ov-next-k,
+.ov-next-n {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--spacing-sm);
+	font-size: var(--text-xs);
+	line-height: 1;
+}
+
+.ov-next-t {
+	font-family: var(--family-main);
+	font-weight: 700;
+	font-size: var(--ov-next);
+	line-height: 0.78;
+	text-transform: uppercase;
+	overflow-wrap: anywhere;
+	transform-origin: left bottom;
+	transition: scale 200ms var(--ov-out);
+}
+
+.ov-next:active .ov-next-t {
+	scale: 0.97;
+}
+
+.ov-next-star {
+	position: absolute;
+	top: 50%;
+	right: var(--ov-pad);
+	width: clamp(44px, 6vw, 88px);
+	aspect-ratio: 1;
+	translate: 0 -50%;
+	transform: scale(0) rotate(-180deg);
+	transition: transform 1000ms var(--ov-ease);
+}
+
+.ov-next:hover .ov-next-star,
+.ov-next:focus-visible .ov-next-star {
+	transform: none;
+}
+
+.ov-next::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 1px;
+	background: currentColor;
+}
+
+/* ---------- media pane ---------- */
+
+.ov-media {
+	position: relative;
+	min-height: 0;
+	overflow: hidden;
+}
+
+/* Awards' vanishing-point lines, redrawn each frame around the frame (see OverlayPage._drawGrid) */
+.ov-grid {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	pointer-events: none;
+}
+
+.ov-grid path {
+	fill: none;
+	stroke: var(--black);
+	stroke-width: 1px;
+}
+
+.ov-tilt {
+	position: absolute;
+	inset: var(--ov-media-pad-y) var(--ov-media-pad-x);
+	transform-style: preserve-3d;
+	will-change: transform;
+}
+
+.ov-frame {
+	position: relative;
+	display: grid;
+	grid-template-rows: auto minmax(0, 1fr);
+	width: 100%;
+	height: 100%;
+	border: 1px solid var(--black);
+	transform-style: preserve-3d;
+}
+
+.ov-fbar {
+	position: relative;
+}
+
+.ov-fbar-in {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	gap: var(--spacing-sm);
+	height: 24px;
+	padding: 0 12px 2px;
+	background: var(--black);
+	color: var(--white);
+	font-family: 'Fraktion Mono', var(--family-secondary), monospace;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 24px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.ov-fbar-t {
+	min-width: 0;
+	overflow: hidden;
+	text-align: center;
+	text-overflow: ellipsis;
+}
+
+.ov-fbar-r {
+	justify-self: end;
+}
+
+.ov-fbar-r a {
+	display: inline-block;
+}
+
+.ov-stage {
+	position: relative;
+	min-height: 0;
+	transform-style: preserve-3d;
+}
+
+.ov-stage-in {
+	position: absolute;
+	inset: 0;
+	transform-style: preserve-3d;
+}
+
+/* before the ink band arrives, and while the real frame is stood in for by the ghost */
+.ov-page.is-pre .ov-fbar-in,
+.ov-page.is-pre .ov-stage-in {
+	clip-path: inset(0 100% 0 0);
+}
+
+.ov-page.is-ghosted .ov-frame {
+	visibility: hidden;
+}
+
+.ov-stage-in iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	background: var(--white);
+	opacity: 0;
+	transition: opacity 600ms var(--ov-out);
+}
+
+.ov-stage-in.is-live iframe {
+	opacity: 1;
+	pointer-events: auto !important; /* beat style.css .lenis-scrolling iframe rule */
+}
+
+.ov-stage-in:not(.is-live) iframe {
+	pointer-events: none;
+}
+
+.ov-stage-in .ov-art {
+	transition: opacity 500ms var(--ov-out);
+}
+
+.ov-stage-in.is-live .ov-art {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ov-img {
+	position: absolute;
+	inset: 3%;
+	width: 94%;
+	height: 94%;
+	object-fit: contain;
+	background: var(--white);
+}
+
+.ov-code {
+	position: absolute;
+	inset: 0;
+	margin: 0;
+	padding: var(--spacing-sm);
+	overflow: auto;
+	background: var(--white);
+	font-family: var(--family-secondary);
+	font-size: var(--text-xs);
+	line-height: 1.4;
+	text-transform: none;
+	white-space: pre;
+	tab-size: 4;
+	overscroll-behavior: contain;
+}
+
+.ov-code {
+	counter-reset: ln;
+}
+
+.ov-cl {
+	display: block;
+	padding-left: 3.2em;
+	text-indent: -3.2em;
+}
+
+.ov-cl::before {
+	counter-increment: ln;
+	content: counter(ln, decimal-leading-zero);
+	display: inline-block;
+	width: 2em;
+	margin-right: 1.2em;
+	text-indent: 0;
+}
+
+.ov-code:focus-visible {
+	outline: 1px solid var(--orange);
+	outline-offset: -3px;
+}
+
+.ov-fallback {
+	position: absolute;
+	left: var(--ov-pad);
+	bottom: var(--ov-pad);
+	z-index: 5;
+	padding: var(--spacing-xs) var(--spacing-sm);
+	background: var(--white);
+	border: 1px solid var(--black);
+	font-family: 'Editorial New', serif;
+	font-weight: 200;
+	font-size: 1.25rem;
+	line-height: 1.3;
+	text-transform: none;
+}
+
+/* ---------- smaller screens ---------- */
+
+@media (width <= 1080px) {
 	.ov-summary {
 		font-size: 1.75rem;
 	}
 }
 
 @media (width <= 750px) {
-	.ov-main {
-		grid-template-columns: 1fr;
-		grid-template-rows: auto;
+	.overlay {
+		--ov-title: clamp(64px, 24vw, 130px);
+		--ov-next: clamp(52px, 17vw, 100px);
+	}
+
+	.ov-nav {
+		gap: 0;
+	}
+
+	.ov-lab {
+		display: none;
+	}
+
+	.ov-btn {
+		min-width: 44px;
+		justify-content: center;
+		padding: 0 var(--spacing-xs);
+	}
+
+	/* the whole page scrolls: media on top, text under it */
+	.ov-page {
 		overflow-y: auto;
 		overscroll-behavior: contain;
+		scrollbar-width: none;
+	}
+
+	.ov-page::-webkit-scrollbar {
+		display: none;
+	}
+
+	.ov-page-in {
+		position: relative;
+		inset: auto;
+		display: flex;
+		flex-direction: column;
+		min-height: 100%;
+	}
+
+	.ov-vr,
+	.ov-grid {
+		display: none;
+	}
+
+	.ov-media {
+		order: 1;
+		flex: none;
+		padding: var(--ov-pad);
+		border-bottom: 1px solid var(--black);
+	}
+
+	.ov-tilt {
+		position: relative;
+		inset: auto;
+		height: min(56dvh, 118vw);
+		will-change: auto;
 	}
 
 	.ov-text {
 		order: 2;
 		overflow: visible;
-		border-right: 0;
 	}
 
-	.ov-media {
-		order: 1;
-		height: 60dvh;
-		border-bottom: 1px solid var(--black);
+	.ov-text-in {
+		padding-top: var(--spacing-lg);
 	}
 
-	.ov-nav {
-		display: none;
+	.ov-summary {
+		font-size: 1.75rem;
+	}
+
+	.ov-next {
+		min-height: 46dvh;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ov-btn,
+	.ov-u::after,
+	.ov-row::before,
+	.ov-row::after,
+	.ov-row-star,
+	.ov-index .ov-ln-in,
+	.ov-next,
+	.ov-next-wash,
+	.ov-next-star,
+	.ov-stage-in iframe,
+	.ov-stage-in .ov-art {
+		transition: none;
 	}
 }
