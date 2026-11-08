@@ -63,7 +63,7 @@ export default class Navbar {
 				this.navList.classList.remove('active');
 				this._setActiveState(false);
 
-				this.scroll.scrollTo(target);
+				this._scrollToSection(target);
 
 				if (target.classList.contains('about')) this.about?.onEnter?.();
 				if (target.classList.contains('works')) this.works?.onEnter?.();
@@ -73,6 +73,30 @@ export default class Navbar {
 				if (target.classList.contains('contact')) this.contact?.onEnter?.();
 			});
 		});
+	}
+
+	// Sticky sections report a wrong rect.top once they are stuck, so measure the
+	// position they would have in normal flow.
+	_naturalTop(el) {
+		const prev = el.style.position;
+		el.style.position = 'relative';
+		const top = el.getBoundingClientRect().top + window.scrollY;
+		el.style.position = prev;
+		return top;
+	}
+
+	_scrollToSection(target) {
+		const done = () => {
+			this.app.isNavigating = false;
+		};
+		// While travelling, intermediate sections must not lock the scroll back to themselves.
+		this.app.isNavigating = true;
+		this.scroll.scrollTo(this._naturalTop(target), {
+			lock: true,
+			force: true,
+			onComplete: done,
+		});
+		setTimeout(done, 3000);
 	}
 
 	_setActiveState(isActive) {
