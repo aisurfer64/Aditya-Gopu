@@ -19,18 +19,7 @@
 
 .lamp-content {
 	margin: 0 0 0 auto;
-	width: clamp(96px, min(11vw, 17dvh), 190px);
-}
-
-.lamp-content__text {
-	display: flex;
-	justify-content: space-between;
-	margin-top: var(--spacing-xs);
-}
-
-.lamp-content__text::selection {
-	background: var(--black);
-	color: var(--white);
+	width: clamp(140px, min(16vw, 24dvh), 250px);
 }
 
 .lamp-link {
@@ -42,7 +31,7 @@
 
 .lamp {
 	background: var(--grey);
-	aspect-ratio: 3 / 4;
+	aspect-ratio: 1024 / 665;
 	overflow: hidden;
 	cursor: pointer;
 }
@@ -61,6 +50,16 @@
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+	display: block;
+}
+
+.lamp img {
+	transition: filter 350ms ease, opacity 350ms ease;
+}
+
+.lamp-link:hover .lamp img,
+.lamp:hover img {
+	filter: grayscale(100%);
 }
 
 .small-img {
@@ -171,7 +170,7 @@
 	}
 
 	.lamp-content {
-		width: clamp(96px, min(20vw, 18dvh), 132px);
+		width: clamp(120px, min(24vw, 20dvh), 180px);
 	}
 
 	.header {
