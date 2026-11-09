@@ -18,7 +18,10 @@ const ALLOW_LIVE = 'autoplay; fullscreen; xr-spatial-tracking';
 const ALLOW_THUMB = 'xr-spatial-tracking';
 
 // `load` is the only signal a cross-origin page gives, and it also fires for a refused (X-Frame-Options / CSP) or
-// unreachable frame, so a missing `load` is the one failure we can see. A slow site must never be mistaken for it:
+// unreachable frame, so a missing `load` is the one failure we can see. (Checked against google.com, github.com, a
+// dead host and a closed port: `load`, contentDocument, location errors, Resource Timing entries and window props
+// are identical to a working site, so a refused frame cannot be told apart from the embedder. A site that must fall
+// back to the art when it is not embeddable has to use `handshake`.) A slow site must never be mistaken for it:
 // 3D pages on a slow link legitimately take tens of seconds, so the cut-off is generous and only frees a hung frame.
 const HANG_MIN = 40000;
 // After `load` the page still has to boot (WebGL scene, nested viewer). Thumbnails wait longer, in proportion to how
@@ -44,7 +47,7 @@ let seq = 0;
  * hidden one. A reveal that completes while paused is held back and plays on resume, so it is seen.
  */
 export default class Embed {
-	constructor(frame, { url, handshake = false, w = 1440, h = 900, interactive = false, timeout = 4000 }) {
+	constructor(frame, { url, handshake = false, w = 1440, h = 900, interactive = false, timeout = 4000, hang = HANG_MIN }) {
 		this.frame = frame;
 		this.url = url;
 		this.handshake = handshake;
@@ -52,6 +55,7 @@ export default class Embed {
 		this.h = h;
 		this.interactive = interactive;
 		this.timeout = timeout;
+		this.hang = hang;
 		this.iframe = null;
 		this.loaded = false;
 		this.id = `${++seq}`;
@@ -113,7 +117,7 @@ export default class Embed {
 		// only a frame that never loads is given up on, and only after a long time
 		this._timer = setTimeout(() => {
 			if (!this.loaded && !this.frame.classList.contains('is-live')) this._blocked();
-		}, Math.max(this.timeout, HANG_MIN));
+		}, Math.max(this.timeout, this.hang));
 	}
 
 	pause(reason = 'pause') {
