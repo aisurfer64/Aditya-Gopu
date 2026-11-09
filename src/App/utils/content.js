@@ -114,8 +114,16 @@ const projectList = [
 		summary: TEASER,
 		body: BODY,
 		facts: [{ k: 'Type', v: 'Research poster' }],
-		// Set src to e.g. 'images/projects/research-poster/poster.avif'.
-		media: { type: 'image', src: null, alt: '' },
+		// src: display image; thumb: small preview; full: full-resolution render for zooming (3402x3888).
+		media: {
+			type: 'image',
+			src: 'images/projects/research-poster/poster.webp',
+			thumb: 'images/projects/research-poster/poster-thumb.webp',
+			full: 'images/projects/research-poster/poster-full.webp',
+			w: 3402,
+			h: 3888,
+			alt: 'Research poster: Lipid-based Codelivery of Doxorubicin and siRNA PD-L1, a multi-function chemo-immunotherapy selective to pancreatic cancer via its MUC1 overexpression',
+		},
 		link: { href: null, label: '' },
 	},
 	{
