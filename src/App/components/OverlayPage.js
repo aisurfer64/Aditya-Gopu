@@ -3,6 +3,7 @@ import { projects } from '../utils/content';
 import { prefersReducedMotion, bezier, pageFrames, power4out } from '../utils/constants';
 import { splitLetters, splitLines, gridPath, band, tween, PaneScroll, Magnet, clamp, inOut } from './OverlayFx';
 import { renderArt, isPlaceholderSnippet } from './OverlayArt';
+import OverlayPoster, { posterHTML } from './OverlayPoster';
 
 let uid = 0;
 
@@ -43,6 +44,7 @@ export default class OverlayPage {
 		this.i = index;
 		this.p = projects[index];
 		this.mobile = mobile;
+		this.fineMq = window.matchMedia('(pointer: fine)');
 		this.titleId = `ov-title-${++uid}`;
 		this.dead = false;
 		this.introDone = false;
@@ -77,7 +79,7 @@ export default class OverlayPage {
 			if (m.url) right = `<a class="ov-u" href="${esc(m.url)}" target="_blank" rel="noopener"><span>Open in new tab ↗</span></a>`;
 		} else if (m.type === 'image') {
 			label = m.src ? 'Poster' : 'Image pending';
-			if (m.src) real = `<img class="ov-img" src="${esc(m.src)}" alt="${esc(m.alt)}" decoding="async" />`;
+			if (m.src) real = posterHTML(`<img class="ov-img ov-poster-img" src="${esc(m.src)}" alt="${esc(m.alt)}" decoding="async" draggable="false" />`, esc(p.title));
 		} else {
 			label = 'Code';
 			if (!isPlaceholderSnippet(m.snippet)) {
@@ -183,6 +185,11 @@ export default class OverlayPage {
 		this.magnets = [...this.el.querySelectorAll('[data-magnet]')].map(el => new Magnet(el));
 
 		this._bindImg();
+		const pv = this.el.querySelector('.ov-poster');
+		if (pv) {
+			const m = this.p.media || {};
+			this.poster = new OverlayPoster(pv, { full: m.full ? String(m.full) : '', w: m.w || 3402, h: m.h || 3888, touch: !this.fineMq.matches });
+		}
 		this._bindScroll();
 		this._bindIO();
 
@@ -596,6 +603,8 @@ export default class OverlayPage {
 		if (this.pane) this.pane.destroy();
 		this.magnets.forEach(m => m.reset());
 		this.magnets = [];
+		if (this.poster) this.poster.destroy();
+		this.poster = null;
 		if (this.embed) this.embed.destroy();
 		this.embed = null;
 		this.el.remove();

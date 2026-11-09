@@ -1,0 +1,144 @@
+/* ==========================================================================
+   Poster viewer (OverlayPoster.js): the image inside its ink frame, mono controls on a hairline strip.
+   Paper and ink only; orange for focus. No shadow, blur or radius.
+   ========================================================================== */
+
+.ov-poster {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-rows: minmax(0, 1fr) auto;
+	background: var(--white);
+}
+
+.ov-poster-view {
+	position: relative;
+	overflow: hidden;
+	cursor: zoom-in;
+	user-select: none;
+	-webkit-user-select: none;
+	touch-action: pan-y;
+}
+
+.ov-poster.is-zoomed .ov-poster-view {
+	cursor: grab;
+}
+
+.ov-poster.is-drag .ov-poster-view {
+	cursor: grabbing;
+}
+
+.ov-poster-view:focus-visible {
+	outline: 1px solid var(--orange);
+	outline-offset: -3px;
+}
+
+/* beats .ov-img (inset 3% / 94%): OverlayPoster sizes and places the image in px */
+.ov-poster .ov-poster-img {
+	position: absolute;
+	inset: auto;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	max-width: none;
+	object-fit: fill;
+	transform-origin: 50% 50%;
+	/* no will-change: a promoted layer keeps its fit-size raster and the zoom turns to mush */
+	-webkit-user-drag: none;
+	pointer-events: none;
+}
+
+.ov-poster-ctl {
+	min-width: 0;
+	overflow: hidden;
+	display: flex;
+	align-items: stretch;
+	min-height: 32px;
+	border-top: 1px solid var(--black);
+	background: var(--white);
+	font-family: 'Fraktion Mono', var(--family-secondary), monospace;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	white-space: nowrap;
+}
+
+.ov-pc-l,
+.ov-pc-b,
+.ov-pc-st {
+	display: inline-flex;
+	align-items: center;
+	padding: 0 12px;
+}
+
+.ov-pc-l {
+	padding-right: 4px;
+}
+
+.ov-pc-b {
+	min-width: 32px;
+	justify-content: center;
+	font: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	color: inherit;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	transition: background 200ms var(--ov-out), color 200ms var(--ov-out), scale 160ms var(--ov-out);
+}
+
+.ov-pc-b:hover,
+.ov-pc-b:focus-visible {
+	background: var(--black);
+	color: var(--white);
+}
+
+.ov-pc-b:focus-visible {
+	outline: 1px solid var(--orange);
+	outline-offset: -3px;
+}
+
+.ov-pc-b:active {
+	scale: 0.93;
+}
+
+.ov-pc-reset {
+	margin-left: 4px;
+	border-left: 1px solid var(--black);
+	padding: 0 14px;
+}
+
+.ov-pc-st {
+	min-width: 0;
+	margin-left: auto;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* thumbs and phones: bigger hit areas, shorter status */
+@media (pointer: coarse) {
+	.ov-poster-ctl {
+		min-height: 44px;
+	}
+
+	.ov-pc-b {
+		min-width: 44px;
+	}
+}
+
+@media (width <= 750px) {
+	.ov-pc-st {
+		padding-left: 6px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ov-pc-b {
+		transition: none;
+	}
+}

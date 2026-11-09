@@ -136,16 +136,14 @@ export default class Overlay {
 		root.addEventListener('mouseover', this._over);
 		root.addEventListener('mouseleave', () => (this.app.mouse.mouse.style.background = ''));
 
-		// Focus stays inside the dialog: Tab past the last stop (a live site's own tab stops come last) lands on
-		// Close, Shift+Tab before the first stop lands on the last one.
+		// Focus stays inside the dialog: Tab past the last stop (a live site's own tab stops come last) wraps to the first
+		// (Prev, then Next, Close), Shift+Tab before the first stop lands on the last one.
 		root.addEventListener('focusin', e => {
 			const t = e.target.closest && e.target.closest('.ov-trap');
 			if (!t) return;
-			if (t.dataset.trap === 'end') root.querySelector('.ov-close').focus({ preventScroll: true });
-			else {
-				const stops = this._tabStops();
-				if (stops.length) stops[stops.length - 1].focus({ preventScroll: true });
-			}
+			const stops = this._tabStops();
+			const to = t.dataset.trap === 'end' ? stops[0] : stops[stops.length - 1];
+			if (to) to.focus({ preventScroll: true });
 		});
 	}
 
@@ -462,8 +460,38 @@ export default class Overlay {
 			this._wantClose = true;
 			return;
 		}
-		if (this.pushed && history.state && history.state.project) history.back();
+		if (this.pushed && history.state && history.state.project) this._back();
 		else this._close();
+	}
+
+	// history.back() walks the joint session history, and a live site that navigates one of its own frames (the 3D viewer
+	// does) adds entries there: the back is then spent inside the iframe and the overlay stays open. So walk to the page's
+	// own previous entry with the Navigation API (it lists top-level entries only) and never trust a back that produced
+	// no popstate: if none arrives, close directly.
+	_back() {
+		let popped = false;
+		const on = () => (popped = true);
+		window.addEventListener('popstate', on, { once: true });
+		let used = false;
+		try {
+			const nav = window.navigation;
+			if (nav && nav.entries && nav.currentEntry) {
+				const prev = nav.entries()[nav.currentEntry.index - 1];
+				if (prev && !/#projects\//.test(prev.url)) {
+					const t = nav.traverseTo(prev.key);
+					if (t) {
+						t.committed.catch(() => {});
+						t.finished.catch(() => {});
+					}
+					used = true;
+				}
+			}
+		} catch {}
+		if (!used) history.back();
+		setTimeout(() => {
+			window.removeEventListener('popstate', on);
+			if (!popped && this.root && !this.closing && !this.busy) this._close();
+		}, 700);
 	}
 
 	async _close() {
@@ -555,8 +583,8 @@ export default class Overlay {
 		this.app.mouse.mouse.style.background = '';
 		[...document.body.children].forEach(el => (el.inert = false));
 
-		// a deep link has no history entry of our own to pop: just drop the stale hash
-		if (!this.pushed && /^#projects\//.test(location.hash)) {
+		// a deep link has no history entry of our own to pop (and a back spent inside an iframe leaves the hash): drop it
+		if (/^#projects\//.test(location.hash)) {
 			history.replaceState(null, '', location.pathname + location.search);
 		}
 
@@ -586,6 +614,7 @@ export default class Overlay {
 	_onKey(e) {
 		if (!this.root) return;
 		if (e.key === 'Escape') this._requestClose();
+		else if (this.page && this.page.poster && !this.closing && this.page.poster.handleKey(e)) e.preventDefault();
 		else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
 			if (e.altKey || e.ctrlKey || e.metaKey || (e.target.closest && e.target.closest('pre, input, textarea, [contenteditable], iframe'))) return;
 			// the live site is focused: its arrows are its own (orbit, carousel...), not a page turn
