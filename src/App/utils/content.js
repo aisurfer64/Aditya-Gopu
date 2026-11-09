@@ -1,6 +1,6 @@
 // Single source of truth for the Work + Projects sections.
 // Rendered to HTML at build time (vite.config.js `context`) and read at runtime by the detail overlay.
-// Work items 001-004 carry real copy (from the owner's activity descriptions); everything else is still
+// All five work items carry real copy (from the owner's activity descriptions); everything else is still
 // PLACEHOLDER copy; replace it freely. Missing fields render nothing.
 // Logo images (image.logo: true) are the organizations' own marks, shown in greyscale and coloured on hover.
 // OWNER RULE: never show time commitments (hours/week, weeks/year) on any work item, including future ones.
@@ -92,13 +92,21 @@ export const work = [
 		id: '005',
 		slug: 'intel',
 		org: 'Intel',
-		role: 'Internship',
-		dates: 'YYYY — YYYY',
-		teaser: TEASER,
-		body: BODY,
+		role: 'Computational Artificial Intelligence Intern',
+		dates: 'Grade 10 (Break)',
+		teaser:
+			'Engineered high-performance C++ solutions for the Persistent Memory team, building low-latency storage features from the ground up.',
+		body: [
+			'Worked with Intel’s Artificial Intelligence and Persistent Memory teams to develop a next-generation persistent storage solution that works like random-access memory, improving memory performance for data centers and personal computers.',
+			'Collaborated with the Persistent Memory Development Kit and Programming Languages and Software Engineering teams to publish C++ code samples that help developers program persistent memory applications.',
+			'Implemented data loss prevention across multiple Intel campuses using Veeam Backup and Replication, built a company-wide website consolidating millions of data points, and automated power usage monitoring with Selenium and Grafana.',
+			'Shipped quality code that directly affected Intel engineers by co-developing the Persistent Memory Development Kit, providing critical architecture and programming foundations for enterprise integration.',
+		],
 		facts: [
-			{ k: 'Role', v: 'Internship' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+			{ k: 'Role', v: 'Computational Artificial Intelligence Intern' },
+			{ k: 'Company', v: 'Intel Corporation' },
+			{ k: 'Teams', v: 'Artificial Intelligence, Persistent Memory' },
+			{ k: 'Grade', v: '10 (Break)' },
 		],
 		image: { src: 'images/work/intel/logo.svg', alt: 'Intel logo', logo: true },
 	},
