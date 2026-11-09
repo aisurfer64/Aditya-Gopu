@@ -1,6 +1,7 @@
 // Single source of truth for the Work + Projects sections.
 // Rendered to HTML at build time (vite.config.js `context`) and read at runtime by the detail overlay.
-// Every string below is PLACEHOLDER copy; replace it freely. Missing fields render nothing.
+// Work items 001, 002 and 004 carry real copy (from the owner's activity descriptions); everything else
+// is still PLACEHOLDER copy; replace it freely. Missing fields render nothing.
 
 const BODY = ['Placeholder. Copy to come.'];
 const TEASER = 'Placeholder. One sentence to come.';
@@ -8,31 +9,42 @@ const TEASER = 'Placeholder. One sentence to come.';
 export const work = [
 	{
 		id: '001',
-		slug: 'subscribe-studio',
-		org: 'Subscribe Studio',
-		role: 'Role',
-		dates: 'YYYY — YYYY',
+		slug: 'scribe-studio',
+		org: 'Scribe Studio',
+		role: 'Ex-Lead Developer [acquired]',
+		dates: 'Grades 9, 10 (Year)',
 		feature: true,
-		teaser: TEASER,
-		body: BODY,
-		facts: [
-			{ k: 'Role', v: 'To come' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+		teaser: 'AI Clinical Documentation Software [acquired].',
+		body: [
+			'Built an AI tool to draft discharge summaries & surgical reports.',
+			'Pitched to 6 Midwest medical practices.',
 		],
-		// Set src to e.g. 'images/work/subscribe-studio/large.avif' when the image exists.
+		facts: [
+			{ k: 'Role', v: 'Ex-Lead Developer [acquired]' },
+			{ k: 'Team', v: '3-member entity' },
+			{ k: 'Grades', v: '9, 10 (Year)' },
+			{ k: 'Time', v: '7 hr/wk, 45 wk/yr' },
+		],
+		// Set src to e.g. 'images/work/scribe-studio/large.avif' when the image exists.
 		image: { src: null, alt: '' },
 	},
 	{
 		id: '002',
 		slug: 'duke-research',
 		org: 'Duke',
-		role: 'Research position',
-		dates: 'YYYY — YYYY',
-		teaser: TEASER,
-		body: BODY,
+		role: 'Computational Assistant',
+		dates: 'Grade 11 (Break)',
+		teaser: 'Lefkowitz Lab (2012 Nobel Prize in Chemistry), Duke University Medical Center.',
+		body: [
+			'Helping build a computational framework to compare beta-arrestin isoforms.',
+			'Supporting the lab’s discovery of small-molecule beta-arrestin inhibitors.',
+		],
 		facts: [
-			{ k: 'Role', v: 'Research position' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+			{ k: 'Role', v: 'Computational Assistant' },
+			{ k: 'Lab', v: 'Lefkowitz Lab (2012 Nobel Prize in Chemistry)' },
+			{ k: 'Institution', v: 'Duke University Medical Center' },
+			{ k: 'Grade', v: '11 (Break)' },
+			{ k: 'Time', v: '4 hr/wk, 17 wk/yr' },
 		],
 	},
 	{
@@ -50,15 +62,20 @@ export const work = [
 	},
 	{
 		id: '004',
-		slug: 'here-on-capital',
-		org: 'Here on Capital',
-		role: 'Role',
-		dates: 'YYYY — YYYY',
-		teaser: TEASER,
-		body: BODY,
+		slug: 'huron-capital',
+		org: 'Huron Capital',
+		role: 'Summer Intern',
+		dates: 'Grade 9 (Break)',
+		teaser: 'Detroit private equity firm that invests $50 million or more per company.',
+		body: [
+			'Screened 40 pitch decks from companies with $1.5 billion combined revenue.',
+			'Built 5 full LBO models with self-built C++ software → onboarded 2 others.',
+		],
 		facts: [
-			{ k: 'Role', v: 'To come' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+			{ k: 'Role', v: 'Summer Intern' },
+			{ k: 'Intern to', v: 'Ex-Vice President Ryan Costello' },
+			{ k: 'Grade', v: '9 (Break)' },
+			{ k: 'Time', v: '7 hr/wk, 12 wk/yr' },
 		],
 	},
 	{
