@@ -4,7 +4,7 @@ import App from '../App';
 import OverlayPage from './OverlayPage';
 import { projects } from '../utils/content';
 import { pageFrames, bezier, power3out, prefersReducedMotion } from '../utils/constants';
-import { Roll, Magnet, band, cancelTweens, inOut } from './OverlayFx';
+import { Roll, Magnet, band, cancelTweens, inOut, clamp } from './OverlayFx';
 
 const ruleIn = [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -52,6 +52,7 @@ export default class Overlay {
 		this.mobile = this.mq.matches;
 
 		this._build();
+		this._preconnect();
 		this.savedY = window.scrollY;
 		this.app.isOverlayOpen = true;
 		document.dispatchEvent(new CustomEvent('overlay:open', { detail: { slug } }));
@@ -87,6 +88,7 @@ export default class Overlay {
 		root.setAttribute('aria-modal', 'true');
 		root.setAttribute('data-lenis-prevent', '');
 		root.innerHTML = `
+			<span class="ov-trap" tabindex="0" data-trap="start" aria-hidden="true"></span>
 			<div class="ov-shell">
 				<div class="ov-bar">
 					<div class="ov-bar-l"><span class="ov-idx"></span><span class="ov-count"></span></div>
@@ -99,7 +101,8 @@ export default class Overlay {
 					<i class="ov-progress"></i>
 				</div>
 				<div class="ov-main"></div>
-			</div>`;
+			</div>
+			<span class="ov-trap" tabindex="0" data-trap="end" aria-hidden="true"></span>`;
 		document.body.appendChild(root);
 		this.root = root;
 		this.shell = root.querySelector('.ov-shell');
@@ -132,6 +135,43 @@ export default class Overlay {
 		};
 		root.addEventListener('mouseover', this._over);
 		root.addEventListener('mouseleave', () => (this.app.mouse.mouse.style.background = ''));
+
+		// Focus stays inside the dialog: Tab past the last stop (a live site's own tab stops come last) lands on
+		// Close, Shift+Tab before the first stop lands on the last one.
+		root.addEventListener('focusin', e => {
+			const t = e.target.closest && e.target.closest('.ov-trap');
+			if (!t) return;
+			if (t.dataset.trap === 'end') root.querySelector('.ov-close').focus({ preventScroll: true });
+			else {
+				const stops = this._tabStops();
+				if (stops.length) stops[stops.length - 1].focus({ preventScroll: true });
+			}
+		});
+	}
+
+	// DNS + TLS for the live sites' origins while the page is still arriving (once per origin, kept for later opens).
+	_preconnect() {
+		projects.forEach(p => {
+			const u = p.media && p.media.type === 'embed' && p.media.url;
+			if (!u) return;
+			let origin;
+			try {
+				origin = new URL(u, location.href).origin;
+			} catch {
+				return;
+			}
+			if (document.head.querySelector(`link[rel="preconnect"][href="${origin}"]`)) return;
+			const l = document.createElement('link');
+			l.rel = 'preconnect';
+			l.href = origin;
+			document.head.appendChild(l);
+		});
+	}
+
+	_tabStops() {
+		return [...this.root.querySelectorAll('a[href], button:not([disabled]), iframe, [tabindex="0"]')].filter(
+			el => !el.classList.contains('ov-trap') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden'
+		);
 	}
 
 	_syncBar(dir = 1, animate = true) {
@@ -249,7 +289,11 @@ export default class Overlay {
 
 	_startLoop() {
 		if (this._raf) return;
-		this._onMove = e => (this.ptr = { x: e.clientX, y: e.clientY });
+		this._onMove = e => {
+			this.prevPtr = this.ptr;
+			this.ptr = { x: e.clientX, y: e.clientY, t: e.timeStamp };
+			if (this.inSite) this._setInSite(false);
+		};
 		this._onLeave = () => (this.ptr = null);
 		this._onResize = () => {
 			this.mobile = this.mq.matches;
@@ -272,14 +316,63 @@ export default class Overlay {
 		window.removeEventListener('pointermove', this._onMove);
 		document.documentElement.removeEventListener('mouseleave', this._onLeave);
 		window.removeEventListener('resize', this._onResize);
-		this.ptr = null;
+		this._setInSite(false);
+		this._setSiteFocus(false);
+		this.ptr = this.prevPtr = null;
+	}
+
+	// The pointer is over the live site (inferred: the page stopped hearing it right beside the iframe). The cursor dot
+	// would be stuck at the frame's edge and the tilt would keep the site skewed, so the dot hides and the frame flattens.
+	_setInSite(v) {
+		if (v === this.inSite) return;
+		this.inSite = v;
+		this.app.mouse.mouse.style.opacity = v ? '0' : '';
+	}
+
+	// The site has keyboard focus: Escape and the arrows now belong to it, so say how to get them back.
+	_setSiteFocus(v) {
+		if (v === this.siteFocus) return;
+		this.siteFocus = v;
+		if (v) this._setInSite(true);
+		if (this.page) this.page.setFocusHint(v && this.fineMq.matches);
+	}
+
+	_pointerEnteredSite() {
+		const f = this.page && this.page.siteFrame();
+		const p = this.ptr;
+		if (!f || !p || !p.t || this.closing) return false;
+		const now = performance.now();
+		// events still arriving (the page hears it) means it is not in the site; wait for a short silence
+		if (now - p.t < 90 || now - p.t > 1500) return false;
+		const r = f.getBoundingClientRect();
+		const q = this.prevPtr;
+		const dt = q ? Math.max(1, p.t - q.t) : 16;
+		const mx = q ? p.x - q.x : 0;
+		const my = q ? p.y - q.y : 0;
+		const speed = Math.hypot(mx, my) / dt; // px per ms
+		const margin = clamp(speed * 48, 14, 96);
+		const cx = clamp(p.x, r.left, r.right);
+		const cy = clamp(p.y, r.top, r.bottom);
+		const gx = cx - p.x;
+		const gy = cy - p.y;
+		const gap = Math.hypot(gx, gy);
+		if (gap > margin) return false;
+		// last movement must have been aimed at the frame (or the pointer is already over its box)
+		return gap === 0 || mx * gx + my * gy > 0;
 	}
 
 	_tick() {
 		if (!this.root) return;
 		const reduced = this.rmq.matches;
 		const fine = this.fineMq.matches;
-		const ctx = { ptr: this.ptr, fine, reduced, lockTilt: this.closing };
+		// A cross-origin iframe swallows every pointer and key event and the page behind it hears nothing at all (no
+		// mouseleave, no :hover), so the site is detected from what we can see: the pointer vanishing at its edge, and
+		// document.activeElement being the iframe (a click or Tab into it).
+		if (!this.inSite && fine && this._pointerEnteredSite()) this._setInSite(true);
+		const sf = this.page && this.page.siteFrame();
+		const focused = !!sf && document.activeElement === sf;
+		if (focused !== !!this.siteFocus) this._setSiteFocus(focused);
+		const ctx = { ptr: this.ptr, fine, reduced, lockTilt: this.closing, inSite: this.inSite };
 		let prog = 0;
 		this.pages.forEach(p => {
 			const v = p.tick(ctx);
@@ -320,16 +413,18 @@ export default class Overlay {
 		this.root.setAttribute('aria-labelledby', page.titleId);
 		this._syncBar(dir, !this.rmq.matches);
 
+		// Two live sites must never run at once: the incoming one is only mounted after the outgoing page (and its
+		// iframe) is gone, and the turn's frames stay free of the heavy site's startup.
 		if (this.rmq.matches) {
 			page.introText(0);
-			page.introFrame(0);
+			page.introFrame(0, { mount: false });
 			await ended(page.el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: power3out }));
 		} else {
 			const rtl = dir > 0; // next: the band travels right to left, like a page turned forward
 			const sign = rtl ? -1 : 1;
 			this.main.classList.add('is-turning');
 			page.introText(rtl ? 640 : 160);
-			page.introFrame(rtl ? 260 : 640);
+			page.introFrame(rtl ? 260 : 640, { mount: false });
 			const spin = (el, v) => (el.style.transform = v);
 			const t = band(this.main, {
 				old: old.el,
@@ -351,6 +446,10 @@ export default class Overlay {
 		this.pages = this.pages.filter(x => x !== old);
 		this.page = page;
 		this.main.classList.remove('is-turning');
+		this._setSiteFocus(false);
+		this._setInSite(false);
+		// the new frame's own reveal may still be running when the band has passed: start the site once it is done
+		page.startEmbed();
 		if (hadFocus) page.text.focus({ preventScroll: true });
 		this._release();
 	}
@@ -488,7 +587,9 @@ export default class Overlay {
 		if (!this.root) return;
 		if (e.key === 'Escape') this._requestClose();
 		else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-			if (e.altKey || e.ctrlKey || e.metaKey || (e.target.closest && e.target.closest('pre, input, textarea, [contenteditable]'))) return;
+			if (e.altKey || e.ctrlKey || e.metaKey || (e.target.closest && e.target.closest('pre, input, textarea, [contenteditable], iframe'))) return;
+			// the live site is focused: its arrows are its own (orbit, carousel...), not a page turn
+			if (document.activeElement && document.activeElement.tagName === 'IFRAME') return;
 			this._step(e.key === 'ArrowRight' ? 1 : -1);
 		}
 	}

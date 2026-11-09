@@ -6,8 +6,21 @@ import { renderArt, isPlaceholderSnippet } from './OverlayArt';
 
 let uid = 0;
 
+const FIT_W = 800; // px: width a live site is laid out at (above the usual 768px tablet breakpoint)
+const FIT_MIN = 0.82; // never shrink a site's text below this
+
 const esc = s =>
 	String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+// "morena-labs.vercel.app/path" for the frame bar: the scheme and a bare trailing slash are noise at 12px mono.
+const hostOf = u => {
+	try {
+		const x = new URL(u);
+		return (x.host + x.pathname + x.search).replace(/\/$/, '');
+	} catch {
+		return String(u);
+	}
+};
 
 // One line of text inside its own mask (the slide-up reveal needs the wrapper).
 const ln = html => `<span class="ov-ln"><span class="ov-ln-in">${html}</span></span>`;
@@ -60,7 +73,7 @@ export default class OverlayPage {
 		let live = false;
 
 		if (m.type === 'embed') {
-			label = m.url ? `Live · ${esc(m.url)}` : 'Site link pending';
+			label = m.url ? `Loading · ${esc(hostOf(m.url))}` : 'Site link pending';
 			if (m.url) right = `<a class="ov-u" href="${esc(m.url)}" target="_blank" rel="noopener"><span>Open in new tab ↗</span></a>`;
 		} else if (m.type === 'image') {
 			label = m.src ? 'Poster' : 'Image pending';
@@ -106,7 +119,7 @@ export default class OverlayPage {
 			.join('');
 
 		return `
-		<div class="ov-page-in">
+		<div class="ov-page-in${(p.media || {}).type === 'embed' ? ' ov-page-in--site' : ''}">
 			<section class="ov-text" data-lenis-prevent tabindex="0" aria-label="${esc(p.title)}: details">
 				<div class="ov-text-in">
 					<div class="ov-head">
@@ -157,6 +170,8 @@ export default class OverlayPage {
 		this.frame = q('.ov-frame');
 		this.fbar = q('.ov-fbar');
 		this.fbarIn = q('.ov-fbar-in');
+		this.fbarT = q('.ov-fbar-t');
+		this.host = hostOf((this.p.media || {}).url || '');
 		this.stage = q('.ov-stage');
 		this.stageIn = q('.ov-stage-in');
 		this.el.classList.toggle('is-ghosted', ghosted);
@@ -243,13 +258,57 @@ export default class OverlayPage {
 		if (img.complete && img.naturalWidth) this.stageIn.classList.add('is-live');
 	}
 
+	// Start the live site once the frame's own reveal has finished (the iframe never mounts under a running band, and
+	// during a page turn never beside the outgoing site). Safe to call more than once.
+	startEmbed() {
+		if (this.embedWanted || this.dead) return;
+		this.embedWanted = true;
+		const ready = this.frameReady || Promise.resolve(true);
+		ready.then(ok => ok && this._later(() => this.mountEmbed(), 60));
+	}
+
+	// The live iframe, once it has proven it renders (null before that, and when the site is blocked).
+	siteFrame() {
+		return this.embed && this.embed.iframe && this.stageIn.classList.contains('is-live') ? this.embed.iframe : null;
+	}
+
+	_label(text, hint = false) {
+		if (!this.fbarT) return;
+		this.fbarT.textContent = text;
+		this.fbarT.classList.toggle('is-hint', hint);
+	}
+
+	// While the site holds keyboard focus Escape and the arrows are its own (a cross-origin frame hides every key from us).
+	setFocusHint(on) {
+		if (on) {
+			if (this.siteFrame()) this._label('Click outside the frame for Esc', true);
+		} else if (this.fbarT && this.fbarT.classList.contains('is-hint')) {
+			this._label(`Live · ${this.host}`);
+		}
+	}
+
 	mountEmbed() {
 		const m = this.p.media || {};
-		if (this.embed || this.dead || m.type !== 'embed' || !m.url) return;
-		this.embed = new Embed(this.stageIn, { url: m.url, handshake: !!m.handshake, interactive: true, timeout: 6000 });
+		if (this.embed || this.dead || this.leaving || m.type !== 'embed' || !m.url) return;
+		// Generous: a 3D viewer's `load` waits on its own nested frames, and the placeholder art is the loading state.
+		this.embed = new Embed(this.stageIn, { url: m.url, handshake: !!m.handshake, interactive: true, timeout: 30000 });
 		this.embed.mount();
+		const f = this.embed.iframe;
+		if (f) {
+			f.title = `${this.p.title}: live site`;
+			f.tabIndex = -1; // not a tab stop until it has proven it renders
+		}
 		this.mo = new MutationObserver(() => {
-			if (this.stageIn.classList.contains('is-blocked') && !this.note) {
+			const cl = this.stageIn.classList;
+			if (cl.contains('is-live') && this.embed && this.embed.iframe) {
+				this.embed.iframe.removeAttribute('tabindex');
+				if (!this.liveShown) {
+					this.liveShown = true;
+					this._label(`Live · ${this.host}`);
+				}
+			}
+			if (cl.contains('is-blocked') && !this.note) {
+				this._label(`Unavailable · ${this.host}`);
 				this.note = document.createElement('a');
 				this.note.className = 'ov-fallback';
 				this.note.href = m.url;
@@ -280,6 +339,18 @@ export default class OverlayPage {
 		this.grid.setAttribute('viewBox', `0 0 ${this.mw} ${this.mh}`);
 		this.mr = m.getBoundingClientRect();
 		this._gridKey = '';
+		this._fit();
+	}
+
+	// A live site is laid out as a desktop page: when the frame is narrower than its design width the iframe keeps that
+	// width and is scaled down to fit (never below FIT_MIN, never on a phone, where the site's own mobile layout is right).
+	_fit() {
+		if ((this.p.media || {}).type !== 'embed') return;
+		const k = this.mobile ? 1 : clamp(this.stage.clientWidth / FIT_W, FIT_MIN, 1);
+		const v = k.toFixed(4);
+		if (v === this._k) return;
+		this._k = v;
+		this.stageIn.style.setProperty('--ov-k', v);
 	}
 
 	_onResize() {
@@ -346,13 +417,14 @@ export default class OverlayPage {
 	}
 
 	// The frame arrives: ink band wipes the ink bar and the stage in, tunnel lines grow out of it.
-	introFrame(delay = 0) {
+	introFrame(delay = 0, { mount = true } = {}) {
 		this.el.classList.remove('is-ghosted');
 		const reduced = prefersReducedMotion();
 		if (reduced) {
 			this.el.classList.remove('is-pre');
 			this.grow = 1;
-			this._later(() => this.mountEmbed(), 250);
+			this.frameReady = null;
+			if (mount) this._later(() => this.startEmbed(), 250);
 			return;
 		}
 		// the band sets the hidden state itself on its first frame; drop the CSS stand-in with it
@@ -362,7 +434,9 @@ export default class OverlayPage {
 		this.tweens = [t1, t2];
 		this.el.classList.remove('is-pre');
 		this._tweenGrow(1, 1100, delay + 200);
-		this._later(() => this.mountEmbed(), delay + 700);
+		// the live site is mounted only after the band has finished revealing the stage
+		this.frameReady = t2.finished;
+		if (mount) this.startEmbed();
 	}
 
 	_tweenGrow(to, duration, delay = 0) {
@@ -373,6 +447,7 @@ export default class OverlayPage {
 
 	// Close: type and copy slide away, frame contents wipe off, the tunnel pulls back in.
 	outro() {
+		this.leaving = true;
 		this.el.getAnimations({ subtree: true }).forEach(a => a.cancel());
 		(this.tweens || []).forEach(t => t.cancel());
 		this.stage.style.clipPath = '';
@@ -446,18 +521,23 @@ export default class OverlayPage {
 			ny = clamp((ctx.ptr.y - (r.top + r.height / 2)) / (r.height * 0.8), -1, 1);
 		}
 		if (this.stageIn.classList.contains('is-live')) {
-			const k = this.frame.matches(':hover') ? 0 : 0.35;
+			// over (or focused in) the live site the frame lies flat: no skew under the pointer, crisp text, true hit-testing
+			const k = ctx.inSite || this.frame.matches(':hover') ? 0 : 0.35;
 			nx *= k;
 			ny *= k;
 		}
-		this.px += (nx - this.px) * 0.08;
-		this.py += (ny - this.py) * 0.08;
-		if (Math.abs(this.px) < 0.0005) this.px = 0;
-		if (Math.abs(this.py) < 0.0005) this.py = 0;
+		const ease = ctx.inSite ? 0.22 : 0.08;
+		const eps = ctx.inSite ? 0.004 : 0.0005;
+		this.px += (nx - this.px) * ease;
+		this.py += (ny - this.py) * ease;
+		if (Math.abs(this.px) < eps) this.px = 0;
+		if (Math.abs(this.py) < eps) this.py = 0;
 
 		if (!this.mobile && !reduced) {
-			const dx = this.px * 14;
-			const dy = this.py * 10 + (0.5 - this.progress) * 22;
+			// a live site sits on whole pixels so its text stays crisp
+			const snap = this.stageIn.classList.contains('is-live') ? Math.round : v => v;
+			const dx = snap(this.px * 14);
+			const dy = snap(this.py * 10 + (0.5 - this.progress) * 22);
 			const key = `${dx.toFixed(2)}|${dy.toFixed(2)}|${this.px.toFixed(3)}|${this.py.toFixed(3)}`;
 			if (key !== this._tiltKey) {
 				this._tiltKey = key;
