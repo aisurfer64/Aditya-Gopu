@@ -394,6 +394,20 @@
 	clip-path: inset(0);
 }
 
+/* Organization logos: contained on the paper plate, ink-grey at rest, brand colour on hover/open. */
+.work-plate.is-logo img {
+	object-fit: contain;
+	padding: clamp(12px, 9%, 26px);
+	filter: grayscale(1) contrast(1.12);
+	transition: filter 600ms var(--ease-out);
+}
+
+.work-head:hover .work-plate.is-logo img,
+.work-head:focus-visible .work-plate.is-logo img,
+.work-head[aria-expanded='true'] .work-plate.is-logo img {
+	filter: none;
+}
+
 .work-fig {
 	position: absolute;
 	inset: 0;

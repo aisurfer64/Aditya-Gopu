@@ -1,6 +1,9 @@
 // Single source of truth for the Work + Projects sections.
 // Rendered to HTML at build time (vite.config.js `context`) and read at runtime by the detail overlay.
-// Every string below is PLACEHOLDER copy; replace it freely. Missing fields render nothing.
+// Work items 001-004 carry real copy (from the owner's activity descriptions); everything else is still
+// PLACEHOLDER copy; replace it freely. Missing fields render nothing.
+// Logo images (image.logo: true) are the organizations' own marks, shown in greyscale and coloured on hover.
+// OWNER RULE: never show time commitments (hours/week, weeks/year) on any work item, including future ones.
 
 const BODY = ['Placeholder. Copy to come.'];
 const TEASER = 'Placeholder. One sentence to come.';
@@ -8,58 +11,82 @@ const TEASER = 'Placeholder. One sentence to come.';
 export const work = [
 	{
 		id: '001',
-		slug: 'subscribe-studio',
-		org: 'Subscribe Studio',
-		role: 'Role',
-		dates: 'YYYY — YYYY',
+		slug: 'scribe-studio',
+		org: 'Scribe Studio',
+		role: 'Ex-Lead Developer [acquired]',
+		dates: 'Grades 9, 10 (Year)',
 		feature: true,
-		teaser: TEASER,
-		body: BODY,
-		facts: [
-			{ k: 'Role', v: 'To come' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+		teaser: 'AI Clinical Documentation Software [acquired].',
+		body: [
+			'Built an AI tool to draft discharge summaries & surgical reports.',
+			'Pitched to 6 Midwest medical practices.',
 		],
-		// Set src to e.g. 'images/work/subscribe-studio/large.avif' when the image exists.
-		image: { src: null, alt: '' },
+		facts: [
+			{ k: 'Role', v: 'Ex-Lead Developer [acquired]' },
+			{ k: 'Team', v: '3-member entity' },
+			{ k: 'Grades', v: '9, 10 (Year)' },
+		],
+		image: {
+			src: 'images/work/scribe-studio/large.webp',
+			alt: 'Demo scan of an abdominopelvic CT shown in a planning interface, with a 3D volume view and axial and coronal slice views',
+		},
 	},
 	{
 		id: '002',
 		slug: 'duke-research',
 		org: 'Duke',
-		role: 'Research position',
-		dates: 'YYYY — YYYY',
-		teaser: TEASER,
-		body: BODY,
-		facts: [
-			{ k: 'Role', v: 'Research position' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+		role: 'Computational Assistant',
+		dates: 'Grade 11 (Break)',
+		teaser: 'Lefkowitz Lab (2012 Nobel Prize in Chemistry), Duke University Medical Center.',
+		body: [
+			'Helping build a computational framework to compare beta-arrestin isoforms.',
+			'Supporting the lab’s discovery of small-molecule beta-arrestin inhibitors.',
 		],
+		facts: [
+			{ k: 'Role', v: 'Computational Assistant' },
+			{ k: 'Lab', v: 'Lefkowitz Lab (2012 Nobel Prize in Chemistry)' },
+			{ k: 'Institution', v: 'Duke University Medical Center' },
+			{ k: 'Grade', v: '11 (Break)' },
+		],
+		image: { src: 'images/work/duke-research/logo.svg', alt: 'Duke University logo', logo: true },
 	},
 	{
 		id: '003',
-		slug: 'broad-research',
-		org: 'Broad',
-		role: 'Research assistant',
-		dates: 'YYYY — YYYY',
-		teaser: TEASER,
-		body: BODY,
-		facts: [
-			{ k: 'Role', v: 'Research assistant' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+		slug: 'broad-institute',
+		org: 'Broad Institute',
+		role: 'Large-Data Assistant',
+		dates: 'Grade 11 (School)',
+		teaser: 'Eric and Wendy Schmidt Center, Broad Institute of MIT and Harvard.',
+		body: [
+			'Helped design a nanoparticle drug-delivery system tailored to the pH of the pancreas.',
+			'Worked under postdoctoral researcher Tara Chari.',
 		],
+		facts: [
+			{ k: 'Role', v: 'Large-Data Assistant' },
+			{ k: 'Center', v: 'Eric and Wendy Schmidt Center' },
+			{ k: 'Institution', v: 'Broad Institute of MIT and Harvard' },
+			{ k: 'Grade', v: '11 (School)' },
+			{ k: 'Under', v: 'Postdoctoral researcher Tara Chari' },
+		],
+		image: { src: 'images/work/broad-institute/logo.png', alt: 'Broad Institute logo', logo: true },
 	},
 	{
 		id: '004',
-		slug: 'here-on-capital',
-		org: 'Here on Capital',
-		role: 'Role',
-		dates: 'YYYY — YYYY',
-		teaser: TEASER,
-		body: BODY,
-		facts: [
-			{ k: 'Role', v: 'To come' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+		slug: 'huron-capital',
+		org: 'Huron Capital',
+		role: 'Summer Intern',
+		dates: 'Grade 9 (Break)',
+		teaser: 'Detroit private equity firm that invests $50 million or more per company.',
+		body: [
+			'Screened 40 pitch decks from companies with $1.5 billion combined revenue.',
+			'Built 5 full LBO models with self-built C++ software → onboarded 2 others.',
 		],
+		facts: [
+			{ k: 'Role', v: 'Summer Intern' },
+			{ k: 'Intern to', v: 'Ex-Vice President Ryan Costello' },
+			{ k: 'Grade', v: '9 (Break)' },
+		],
+		image: { src: 'images/work/huron-capital/logo.svg', alt: 'Huron Capital logo', logo: true },
 	},
 	{
 		id: '005',
@@ -114,8 +141,16 @@ const projectList = [
 		summary: TEASER,
 		body: BODY,
 		facts: [{ k: 'Type', v: 'Research poster' }],
-		// Set src to e.g. 'images/projects/research-poster/poster.avif'.
-		media: { type: 'image', src: null, alt: '' },
+		// src: display image; thumb: small preview; full: full-resolution render for zooming (3402x3888).
+		media: {
+			type: 'image',
+			src: 'images/projects/research-poster/poster.webp',
+			thumb: 'images/projects/research-poster/poster-thumb.webp',
+			full: 'images/projects/research-poster/poster-full.webp',
+			w: 3402,
+			h: 3888,
+			alt: 'Research poster: Lipid-based Codelivery of Doxorubicin and siRNA PD-L1, a multi-function chemo-immunotherapy selective to pancreatic cancer via its MUC1 overexpression',
+		},
 		link: { href: null, label: '' },
 	},
 	{
