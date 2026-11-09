@@ -38,7 +38,7 @@ export default class ProjectFx {
 		this.mobileMq = window.matchMedia('(width <= 750px)');
 		const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-		this.state = this.panels.map(() => ({ e: 0, r: 0, covered: false, written: '' }));
+		this.state = this.panels.map(() => ({ e: 0, r: 0, covered: false, parked: false, written: '' }));
 		this.inView = false;
 		this._raf = null;
 		this.awardsEl = document.getElementById('awards');
@@ -276,6 +276,15 @@ export default class ProjectFx {
 			this._applyDepth(i, mobile);
 
 			const panel = this.panels[i];
+
+			// Live thumbnails: a site is paused once the next panel has buried it, and woken a hair before it is exposed
+			// again. Judged on the raw target (not the smoothed value), so a jump in scroll never leaves one asleep in view.
+			const park = !mobile && (s.parked ? targetR[i] > 0.96 : targetR[i] > 0.995);
+			if (park !== s.parked) {
+				s.parked = park;
+				this.projects.setCovered(panel, park);
+			}
+
 			const covered = !mobile && s.r > 0.995 && i < n;
 			if (covered !== s.covered) {
 				s.covered = covered;
