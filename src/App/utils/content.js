@@ -100,6 +100,7 @@ export const work = [
 			{ k: 'Role', v: 'Internship' },
 			{ k: 'Dates', v: 'YYYY — YYYY' },
 		],
+		image: { src: 'images/work/intel/logo.svg', alt: 'Intel logo', logo: true },
 	},
 ];
 
