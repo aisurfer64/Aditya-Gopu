@@ -16,14 +16,17 @@ export const work = [
 		role: 'Ex-Lead Developer [acquired]',
 		dates: 'Grades 9, 10 (Year)',
 		feature: true,
-		teaser: 'AI Clinical Documentation Software [acquired].',
+		teaser: 'Created an AI-powered software suite to streamline clinical documentation.',
 		body: [
-			'Built an AI tool to draft discharge summaries & surgical reports.',
-			'Pitched to 6 Midwest medical practices.',
+			'Clinics and hospitals could use the software to create discharge summaries, operative parts, surgical reports etc.',
+			'ScribeMate was adopted in 6 midwest-based medical practices before all software and IP was acquired by an enterprise software investment firm for a 6-figure exit.',
 		],
 		facts: [
 			{ k: 'Role', v: 'Ex-Lead Developer [acquired]' },
+			{ k: 'Product', v: 'ScribeMate' },
 			{ k: 'Team', v: '3-member entity' },
+			{ k: 'Adoption', v: '6 midwest-based medical practices' },
+			{ k: 'Outcome', v: 'Software and IP acquired (6-figure exit)' },
 			{ k: 'Grades', v: '9, 10 (Year)' },
 		],
 		image: {
