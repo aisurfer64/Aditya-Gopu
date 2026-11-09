@@ -1,7 +1,8 @@
 // Single source of truth for the Work + Projects sections.
 // Rendered to HTML at build time (vite.config.js `context`) and read at runtime by the detail overlay.
-// Work items 001, 002 and 004 carry real copy (from the owner's activity descriptions); everything else
-// is still PLACEHOLDER copy; replace it freely. Missing fields render nothing.
+// Work items 001-004 carry real copy (from the owner's activity descriptions); everything else is still
+// PLACEHOLDER copy; replace it freely. Missing fields render nothing.
+// OWNER RULE: never show time commitments (hours/week, weeks/year) on any work item, including future ones.
 
 const BODY = ['Placeholder. Copy to come.'];
 const TEASER = 'Placeholder. One sentence to come.';
@@ -23,7 +24,6 @@ export const work = [
 			{ k: 'Role', v: 'Ex-Lead Developer [acquired]' },
 			{ k: 'Team', v: '3-member entity' },
 			{ k: 'Grades', v: '9, 10 (Year)' },
-			{ k: 'Time', v: '7 hr/wk, 45 wk/yr' },
 		],
 		// Set src to e.g. 'images/work/scribe-studio/large.avif' when the image exists.
 		image: { src: null, alt: '' },
@@ -44,20 +44,25 @@ export const work = [
 			{ k: 'Lab', v: 'Lefkowitz Lab (2012 Nobel Prize in Chemistry)' },
 			{ k: 'Institution', v: 'Duke University Medical Center' },
 			{ k: 'Grade', v: '11 (Break)' },
-			{ k: 'Time', v: '4 hr/wk, 17 wk/yr' },
 		],
 	},
 	{
 		id: '003',
-		slug: 'broad-research',
-		org: 'Broad',
-		role: 'Research assistant',
-		dates: 'YYYY — YYYY',
-		teaser: TEASER,
-		body: BODY,
+		slug: 'broad-institute',
+		org: 'Broad Institute',
+		role: 'Large-Data Assistant',
+		dates: 'Grade 11 (School)',
+		teaser: 'Eric and Wendy Schmidt Center, Broad Institute of MIT and Harvard.',
+		body: [
+			'Helped design a nanoparticle drug-delivery system tailored to the pH of the pancreas.',
+			'Worked under postdoctoral researcher Tara Chari.',
+		],
 		facts: [
-			{ k: 'Role', v: 'Research assistant' },
-			{ k: 'Dates', v: 'YYYY — YYYY' },
+			{ k: 'Role', v: 'Large-Data Assistant' },
+			{ k: 'Center', v: 'Eric and Wendy Schmidt Center' },
+			{ k: 'Institution', v: 'Broad Institute of MIT and Harvard' },
+			{ k: 'Grade', v: '11 (School)' },
+			{ k: 'Under', v: 'Postdoctoral researcher Tara Chari' },
 		],
 	},
 	{
@@ -75,7 +80,6 @@ export const work = [
 			{ k: 'Role', v: 'Summer Intern' },
 			{ k: 'Intern to', v: 'Ex-Vice President Ryan Costello' },
 			{ k: 'Grade', v: '9 (Break)' },
-			{ k: 'Time', v: '7 hr/wk, 12 wk/yr' },
 		],
 	},
 	{
