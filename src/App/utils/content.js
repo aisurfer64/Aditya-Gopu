@@ -25,8 +25,10 @@ export const work = [
 			{ k: 'Team', v: '3-member entity' },
 			{ k: 'Grades', v: '9, 10 (Year)' },
 		],
-		// Set src to e.g. 'images/work/scribe-studio/large.avif' when the image exists.
-		image: { src: null, alt: '' },
+		image: {
+			src: 'images/work/scribe-studio/large.webp',
+			alt: 'Demo scan of an abdominopelvic CT shown in a planning interface, with a 3D volume view and axial and coronal slice views',
+		},
 	},
 	{
 		id: '002',
