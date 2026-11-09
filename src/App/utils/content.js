@@ -2,6 +2,7 @@
 // Rendered to HTML at build time (vite.config.js `context`) and read at runtime by the detail overlay.
 // Work items 001-004 carry real copy (from the owner's activity descriptions); everything else is still
 // PLACEHOLDER copy; replace it freely. Missing fields render nothing.
+// Logo images (image.logo: true) are the organizations' own marks, shown in greyscale and coloured on hover.
 // OWNER RULE: never show time commitments (hours/week, weeks/year) on any work item, including future ones.
 
 const BODY = ['Placeholder. Copy to come.'];
@@ -47,6 +48,7 @@ export const work = [
 			{ k: 'Institution', v: 'Duke University Medical Center' },
 			{ k: 'Grade', v: '11 (Break)' },
 		],
+		image: { src: 'images/work/duke-research/logo.svg', alt: 'Duke University logo', logo: true },
 	},
 	{
 		id: '003',
@@ -66,6 +68,7 @@ export const work = [
 			{ k: 'Grade', v: '11 (School)' },
 			{ k: 'Under', v: 'Postdoctoral researcher Tara Chari' },
 		],
+		image: { src: 'images/work/broad-institute/logo.png', alt: 'Broad Institute logo', logo: true },
 	},
 	{
 		id: '004',
@@ -83,6 +86,7 @@ export const work = [
 			{ k: 'Intern to', v: 'Ex-Vice President Ryan Costello' },
 			{ k: 'Grade', v: '9 (Break)' },
 		],
+		image: { src: 'images/work/huron-capital/logo.svg', alt: 'Huron Capital logo', logo: true },
 	},
 	{
 		id: '005',

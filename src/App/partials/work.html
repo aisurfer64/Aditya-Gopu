@@ -46,7 +46,7 @@
 							<span class="work-cell"{{#unless image.src}} aria-hidden="true"{{/unless}}>
 								<span class="work-stage">
 									<span class="work-mat"></span>
-									<span class="work-plate">
+									<span class="work-plate{{#if image.logo}} is-logo{{/if}}">
 										{{#if image.src}}<img src="{{image.src}}" alt="{{image.alt}}" loading="lazy" />{{else}}<svg class="work-fig" focusable="false"></svg>{{/if}}
 									</span>
 									<span class="work-sparks" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
