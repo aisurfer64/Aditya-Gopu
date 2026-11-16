@@ -157,8 +157,8 @@ const projectList = [
 		title: 'Research poster',
 		tag: 'Poster',
 		side: 'right',
-		summary: TEASER,
-		body: BODY,
+		summary: 'Engineering Selectivity into Pancreatic Cancer Treatment: pH-Triggered, MUC1-Guided Codelivery of Chemotherapy and Immune Checkpoint Silencing',
+		body: [],
 		facts: [{ k: 'Type', v: 'Research poster' }],
 		// src: display image; thumb: small preview; full: full-resolution render for zooming (3402x3888).
 		media: {
